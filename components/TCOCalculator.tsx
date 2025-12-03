@@ -6,8 +6,8 @@ export default function App() {
     monthlyVisitors: 50000,
     currentConversionRate: 2.5,
     avgRevenuePerConversion: 5000,
-    implementationCost: 150000,
-    annualMaintenanceCost: 50000,
+    implementationCost: 300000,
+    annualMaintenanceCost: 100000,
     conversionRateIncrease: 5,
     engagementIncrease: 5,
     timeToValue: 6
