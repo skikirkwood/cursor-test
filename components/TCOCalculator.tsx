@@ -24,7 +24,7 @@ export default function App() {
     repeatCustomerRate: 30,
     implementationCost: 150000,
     annualLicenseCost: 75000,
-    conversionRateIncrease: 35,
+    conversionRateIncrease: 5,
     timeToMarketReduction: 60,
     devEfficiencyGain: 50,
     downtimeReduction: 90,
