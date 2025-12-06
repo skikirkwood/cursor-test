@@ -749,7 +749,7 @@ export default function App() {
             </div>
             <div class="summary-card">
               <div class="label">Payback Period</div>
-              <div class="value">${paybackMonths.toFixed(1)} mo</div>
+              <div class="value">${paybackMonths.toFixed(1)} months</div>
             </div>
           </div>
           
@@ -784,7 +784,7 @@ export default function App() {
               <div class="stat-desc">Return on total investment including implementation and licensing</div>
             </div>
             <div class="stat-item">
-              <div class="stat-value">${paybackMonths.toFixed(0)}mo</div>
+              <div class="stat-value">${paybackMonths.toFixed(0)} months</div>
               <div class="stat-label">Payback Period</div>
               <div class="stat-desc">Time to recover initial implementation investment</div>
             </div>
@@ -1374,7 +1374,7 @@ export default function App() {
                 <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">Annual Benefit</div><div className="text-xl md:text-2xl font-bold">{formatCurrency(totalAnnualBenefit)}</div></div>
                 <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">5-Year Benefit</div><div className="text-xl md:text-2xl font-bold">{formatCurrency(fiveYearBenefit)}</div></div>
                 <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">ROI (5 Years)</div><div className="text-xl md:text-2xl font-bold">{roi.toFixed(0)}%</div></div>
-                <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">Payback Period</div><div className="text-xl md:text-2xl font-bold">{paybackMonths.toFixed(1)} mo</div></div>
+                <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">Payback Period</div><div className="text-xl md:text-2xl font-bold">{paybackMonths.toFixed(1)} months</div></div>
               </div>
             </div>
 
