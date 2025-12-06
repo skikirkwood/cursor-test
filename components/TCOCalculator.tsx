@@ -1120,7 +1120,7 @@ export default function App() {
               <div class="stat-desc">Total value minus costs</div>
             </div>
             <div class="stat-item">
-              <div class="stat-value">${paybackMonths.toFixed(0)}mo</div>
+              <div class="stat-value">${paybackMonths.toFixed(0)} months</div>
               <div class="stat-label">Payback</div>
               <div class="stat-desc">Time to recover investment</div>
             </div>
