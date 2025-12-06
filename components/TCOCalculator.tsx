@@ -101,9 +101,9 @@ export default function App() {
   const cx = calculateCXImpact();
 
   const totalAnnualBenefit = revenue.totalLift + efficiency.totalSavings + risk.totalRiskReduction + cx.totalCXValue;
-  const threeYearBenefit = totalAnnualBenefit * 3;
-  const totalCost = inputs.implementationCost + (inputs.annualLicenseCost * 3);
-  const netBenefit = threeYearBenefit - totalCost;
+  const fiveYearBenefit = totalAnnualBenefit * 5;
+  const totalCost = inputs.implementationCost + (inputs.annualLicenseCost * 5);
+  const netBenefit = fiveYearBenefit - totalCost;
   const roi = ((netBenefit / totalCost) * 100);
   const paybackMonths = (inputs.implementationCost / (totalAnnualBenefit / 12));
 
@@ -732,12 +732,12 @@ export default function App() {
         <div class="content-left">
           <div class="eyebrow">Executive Summary</div>
           <h2>Total Business Impact</h2>
-          <p class="subtitle">3-year projected value from Contentful implementation</p>
+          <p class="subtitle">5-year projected value from Contentful implementation</p>
           
           <div class="summary-grid">
             <div class="summary-card highlight">
-              <div class="label">3-Year Total Benefit</div>
-              <div class="value">${formatCurrency(threeYearBenefit)}</div>
+              <div class="label">5-Year Total Benefit</div>
+              <div class="value">${formatCurrency(fiveYearBenefit)}</div>
             </div>
             <div class="summary-card highlight">
               <div class="label">Return on Investment</div>
@@ -780,7 +780,7 @@ export default function App() {
           <div class="stats-sidebar">
             <div class="stat-item">
               <div class="stat-value">${roi.toFixed(0)}%</div>
-              <div class="stat-label">3-Year ROI</div>
+              <div class="stat-label">5-Year ROI</div>
               <div class="stat-desc">Return on total investment including implementation and licensing</div>
             </div>
             <div class="stat-item">
@@ -791,7 +791,7 @@ export default function App() {
             <div class="stat-item">
               <div class="stat-value">${formatCurrency(netBenefit)}</div>
               <div class="stat-label">Net Benefit</div>
-              <div class="stat-desc">Total 3-year benefit minus all costs</div>
+              <div class="stat-desc">Total 5-year benefit minus all costs</div>
             </div>
           </div>
         </div>
@@ -1066,7 +1066,7 @@ export default function App() {
         <div class="content-left">
           <div class="eyebrow">Investment Summary</div>
           <h2>Investment & ROI</h2>
-          <p class="subtitle">Comprehensive 3-year financial analysis</p>
+          <p class="subtitle">Comprehensive 5-year financial analysis</p>
           
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 24px 0;">
             <div class="breakdown-section">
@@ -1076,8 +1076,8 @@ export default function App() {
                 <span class="value">${formatCurrency(inputs.implementationCost)}</span>
               </div>
               <div class="breakdown-row">
-                <span class="label">License (3 years)</span>
-                <span class="value">${formatCurrency(inputs.annualLicenseCost * 3)}</span>
+                <span class="label">License (5 years)</span>
+                <span class="value">${formatCurrency(inputs.annualLicenseCost * 5)}</span>
               </div>
               <div class="breakdown-row total">
                 <span class="label">Total Investment</span>
@@ -1092,8 +1092,8 @@ export default function App() {
                 <span class="value">${formatCurrency(totalAnnualBenefit)}</span>
               </div>
               <div class="breakdown-row">
-                <span class="label">3-Year Benefit</span>
-                <span class="value">${formatCurrency(threeYearBenefit)}</span>
+                <span class="label">5-Year Benefit</span>
+                <span class="value">${formatCurrency(fiveYearBenefit)}</span>
               </div>
               <div class="breakdown-row total">
                 <span class="label">Net Benefit</span>
@@ -1111,7 +1111,7 @@ export default function App() {
           <div class="stats-sidebar">
             <div class="stat-item">
               <div class="stat-value">${roi.toFixed(0)}%</div>
-              <div class="stat-label">3-Year ROI</div>
+              <div class="stat-label">5-Year ROI</div>
               <div class="stat-desc">Return on total investment</div>
             </div>
             <div class="stat-item">
@@ -1372,8 +1372,8 @@ export default function App() {
               <h2 className="text-xl md:text-2xl font-bold mb-6">Total Business Impact</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">Annual Benefit</div><div className="text-xl md:text-2xl font-bold">{formatCurrency(totalAnnualBenefit)}</div></div>
-                <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">3-Year Benefit</div><div className="text-xl md:text-2xl font-bold">{formatCurrency(threeYearBenefit)}</div></div>
-                <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">ROI (3 Years)</div><div className="text-xl md:text-2xl font-bold">{roi.toFixed(0)}%</div></div>
+                <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">5-Year Benefit</div><div className="text-xl md:text-2xl font-bold">{formatCurrency(fiveYearBenefit)}</div></div>
+                <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">ROI (5 Years)</div><div className="text-xl md:text-2xl font-bold">{roi.toFixed(0)}%</div></div>
                 <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">Payback Period</div><div className="text-xl md:text-2xl font-bold">{paybackMonths.toFixed(1)} mo</div></div>
               </div>
             </div>
