@@ -1,35 +1,113 @@
 import React, { useState } from 'react';
-import { DollarSign, TrendingUp, Users, Shield, Zap, Calculator, Download, Presentation } from 'lucide-react';
+import { DollarSign, TrendingUp, Users, Shield, Zap, Calculator, Download, Presentation, ArrowLeft } from 'lucide-react';
 
-export default function App() {
-  const [valueDriver, setValueDriver] = useState('revenue');
-  const [inputs, setInputs] = useState({
-    monthlyVisitors: 50000,
-    currentConversionRate: 0.1,
-    avgRevenuePerConversion: 5000,
-    campaignLaunchTime: 30,
-    developerHourlyRate: 150,
-    monthlyDevHoursOnContent: 160,
-    numberOfCMS: 3,
-    cmsMaintenanceCostPerYear: 100000,
-    marketingTeamSize: 10,
-    downtimeHoursPerYear: 24,
-    hourlyRevenueLoss: 50000,
-    complianceAuditCost: 75000,
-    securityIncidentsPerYear: 2,
-    incidentCost: 100000,
-    currentBounceRate: 45,
-    avgSessionDuration: 3.5,
-    customerSatisfactionScore: 70,
-    repeatCustomerRate: 30,
-    implementationCost: 150000,
-    annualLicenseCost: 75000,
-    conversionRateIncrease: 10,
-    timeToMarketReduction: 60,
-    devEfficiencyGain: 50,
-    downtimeReduction: 90,
-    cxImprovement: 25
-  });
+export type ModelType = 'marketing' | 'ecommerce' | 'knowledge';
+
+interface TCOCalculatorProps {
+  model: ModelType;
+  onBack: () => void;
+}
+
+const modelConfigs = {
+  marketing: {
+    name: 'Marketing Sites',
+    enabledDrivers: ['revenue', 'cx'],
+    defaults: {
+      monthlyVisitors: 100000,
+      currentConversionRate: 0.5,
+      avgRevenuePerConversion: 2000,
+      campaignLaunchTime: 21,
+      developerHourlyRate: 150,
+      monthlyDevHoursOnContent: 80,
+      numberOfCMS: 2,
+      cmsMaintenanceCostPerYear: 75000,
+      marketingTeamSize: 8,
+      downtimeHoursPerYear: 12,
+      hourlyRevenueLoss: 25000,
+      complianceAuditCost: 50000,
+      securityIncidentsPerYear: 1,
+      incidentCost: 75000,
+      currentBounceRate: 55,
+      avgSessionDuration: 2.5,
+      customerSatisfactionScore: 65,
+      repeatCustomerRate: 25,
+      implementationCost: 125000,
+      annualLicenseCost: 60000,
+      conversionRateIncrease: 15,
+      timeToMarketReduction: 65,
+      devEfficiencyGain: 45,
+      downtimeReduction: 85,
+      cxImprovement: 30
+    }
+  },
+  ecommerce: {
+    name: 'Ecommerce Sites',
+    enabledDrivers: ['revenue', 'risk'],
+    defaults: {
+      monthlyVisitors: 250000,
+      currentConversionRate: 2.5,
+      avgRevenuePerConversion: 150,
+      campaignLaunchTime: 14,
+      developerHourlyRate: 175,
+      monthlyDevHoursOnContent: 120,
+      numberOfCMS: 3,
+      cmsMaintenanceCostPerYear: 150000,
+      marketingTeamSize: 12,
+      downtimeHoursPerYear: 8,
+      hourlyRevenueLoss: 100000,
+      complianceAuditCost: 100000,
+      securityIncidentsPerYear: 3,
+      incidentCost: 150000,
+      currentBounceRate: 40,
+      avgSessionDuration: 4.0,
+      customerSatisfactionScore: 72,
+      repeatCustomerRate: 35,
+      implementationCost: 200000,
+      annualLicenseCost: 100000,
+      conversionRateIncrease: 20,
+      timeToMarketReduction: 70,
+      devEfficiencyGain: 55,
+      downtimeReduction: 95,
+      cxImprovement: 20
+    }
+  },
+  knowledge: {
+    name: 'Knowledge Bases',
+    enabledDrivers: ['efficiency', 'cx'],
+    defaults: {
+      monthlyVisitors: 75000,
+      currentConversionRate: 0.1,
+      avgRevenuePerConversion: 500,
+      campaignLaunchTime: 30,
+      developerHourlyRate: 140,
+      monthlyDevHoursOnContent: 200,
+      numberOfCMS: 4,
+      cmsMaintenanceCostPerYear: 120000,
+      marketingTeamSize: 6,
+      downtimeHoursPerYear: 16,
+      hourlyRevenueLoss: 15000,
+      complianceAuditCost: 60000,
+      securityIncidentsPerYear: 1,
+      incidentCost: 50000,
+      currentBounceRate: 35,
+      avgSessionDuration: 5.0,
+      customerSatisfactionScore: 60,
+      repeatCustomerRate: 45,
+      implementationCost: 100000,
+      annualLicenseCost: 50000,
+      conversionRateIncrease: 5,
+      timeToMarketReduction: 50,
+      devEfficiencyGain: 60,
+      downtimeReduction: 80,
+      cxImprovement: 35
+    }
+  }
+};
+
+export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
+  const config = modelConfigs[model];
+  const [valueDriver, setValueDriver] = useState(config.enabledDrivers[0]);
+  const [inputs, setInputs] = useState(config.defaults);
 
   const handleInputChange = (field, value) => {
     setInputs(prev => ({ ...prev, [field]: parseFloat(value) }));
@@ -100,7 +178,11 @@ export default function App() {
   const risk = calculateRiskImpact();
   const cx = calculateCXImpact();
 
-  const totalAnnualBenefit = revenue.totalLift + efficiency.totalSavings + risk.totalRiskReduction + cx.totalCXValue;
+  const totalAnnualBenefit = 
+    (config.enabledDrivers.includes('revenue') ? revenue.totalLift : 0) + 
+    (config.enabledDrivers.includes('efficiency') ? efficiency.totalSavings : 0) + 
+    (config.enabledDrivers.includes('risk') ? risk.totalRiskReduction : 0) + 
+    (config.enabledDrivers.includes('cx') ? cx.totalCXValue : 0);
   const fiveYearBenefit = totalAnnualBenefit * 5;
   const totalCost = inputs.implementationCost + (inputs.annualLicenseCost * 5);
   const netBenefit = fiveYearBenefit - totalCost;
@@ -164,13 +246,18 @@ export default function App() {
   const generatePresentation = () => {
     const logoUrl = 'https://images.ctfassets.net/jtqsy5pye0zd/6wNuQ2xMvbw134rccObi0q/bf61badc6d6d9780609e541713f0bba6/Contentful_Logo_2.5_Dark.svg';
     
+    // Build slides array - always include title, exec summary, and investment slides
+    // Include only enabled value driver slides
+    const enabledDrivers = config.enabledDrivers;
+    const totalSlides = 3 + enabledDrivers.length; // title + exec summary + investment + enabled drivers
+    
     const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contentful Business Case</title>
+  <title>Contentful Business Case - ${config.name}</title>
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -754,26 +841,26 @@ export default function App() {
           </div>
           
           <div class="driver-cards">
-            <div class="driver-card green">
+            ${enabledDrivers.includes('revenue') ? `<div class="driver-card green">
               <div class="icon">📈</div>
               <div class="name">Revenue</div>
               <div class="amount">${formatCurrency(revenue.totalLift)}</div>
-            </div>
-            <div class="driver-card blue">
+            </div>` : ''}
+            ${enabledDrivers.includes('efficiency') ? `<div class="driver-card blue">
               <div class="icon">⚡</div>
               <div class="name">Efficiency</div>
               <div class="amount">${formatCurrency(efficiency.totalSavings)}</div>
-            </div>
-            <div class="driver-card orange">
+            </div>` : ''}
+            ${enabledDrivers.includes('risk') ? `<div class="driver-card orange">
               <div class="icon">🛡️</div>
               <div class="name">Risk</div>
               <div class="amount">${formatCurrency(risk.totalRiskReduction)}</div>
-            </div>
-            <div class="driver-card yellow">
+            </div>` : ''}
+            ${enabledDrivers.includes('cx') ? `<div class="driver-card yellow">
               <div class="icon">👥</div>
               <div class="name">CX</div>
               <div class="amount">${formatCurrency(cx.totalCXValue)}</div>
-            </div>
+            </div>` : ''}
           </div>
         </div>
         <div class="content-right">
@@ -799,8 +886,10 @@ export default function App() {
       <div class="slide-footer">© 2025 Contentful</div>
     </div>
 
-    <!-- Slide 3: Revenue Growth -->
-    <div class="slide" data-slide="2">
+    <!-- Value Driver Slides (conditionally rendered) -->
+    ${enabledDrivers.includes('revenue') ? `
+    <!-- Revenue Growth -->
+    <div class="slide" data-slide="${2 + enabledDrivers.indexOf('revenue')}">
       <img src="${logoUrl}" alt="Contentful" class="logo">
       <div class="slide-content">
         <div class="content-left">
@@ -860,9 +949,11 @@ export default function App() {
       </div>
       <div class="slide-footer">© 2025 Contentful</div>
     </div>
+    ` : ''}
 
-    <!-- Slide 4: Operational Efficiency -->
-    <div class="slide" data-slide="3">
+    ${enabledDrivers.includes('efficiency') ? `
+    <!-- Operational Efficiency -->
+    <div class="slide" data-slide="${2 + enabledDrivers.indexOf('efficiency')}">
       <img src="${logoUrl}" alt="Contentful" class="logo">
       <div class="slide-content">
         <div class="content-left">
@@ -926,9 +1017,11 @@ export default function App() {
       </div>
       <div class="slide-footer">© 2025 Contentful</div>
     </div>
+    ` : ''}
 
-    <!-- Slide 5: Risk Mitigation -->
-    <div class="slide" data-slide="4">
+    ${enabledDrivers.includes('risk') ? `
+    <!-- Risk Mitigation -->
+    <div class="slide" data-slide="${2 + enabledDrivers.indexOf('risk')}">
       <img src="${logoUrl}" alt="Contentful" class="logo">
       <div class="slide-content">
         <div class="content-left">
@@ -992,9 +1085,11 @@ export default function App() {
       </div>
       <div class="slide-footer">© 2025 Contentful</div>
     </div>
+    ` : ''}
 
-    <!-- Slide 6: Customer Experience -->
-    <div class="slide" data-slide="5">
+    ${enabledDrivers.includes('cx') ? `
+    <!-- Customer Experience -->
+    <div class="slide" data-slide="${2 + enabledDrivers.indexOf('cx')}">
       <img src="${logoUrl}" alt="Contentful" class="logo">
       <div class="slide-content">
         <div class="content-left">
@@ -1058,9 +1153,10 @@ export default function App() {
       </div>
       <div class="slide-footer">© 2025 Contentful</div>
     </div>
+    ` : ''}
 
-    <!-- Slide 7: Investment & ROI -->
-    <div class="slide" data-slide="6">
+    <!-- Investment & ROI -->
+    <div class="slide" data-slide="${2 + enabledDrivers.length}">
       <img src="${logoUrl}" alt="Contentful" class="logo">
       <div class="slide-content">
         <div class="content-left">
@@ -1136,7 +1232,7 @@ export default function App() {
       <div class="nav-controls" id="navControls">
         <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">←</button>
         <div class="slide-indicator" id="slideIndicator"></div>
-        <span class="slide-counter" id="slideCounter">1 / 7</span>
+        <span class="slide-counter" id="slideCounter">1 / ${totalSlides}</span>
         <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">→</button>
       </div>
     </div>
@@ -1144,7 +1240,7 @@ export default function App() {
 
   <script>
     let currentSlide = 0;
-    const totalSlides = 7;
+    const totalSlides = ${totalSlides};
     let hideTimeout;
     const HIDE_DELAY = 2000;
     
@@ -1255,21 +1351,27 @@ export default function App() {
     </div>
   );
 
-  const valueDrivers = [
+  const allValueDrivers = [
     { id: 'revenue', name: 'Revenue Growth', icon: TrendingUp, color: 'green' },
     { id: 'efficiency', name: 'Operational Efficiency', icon: Zap, color: 'blue' },
     { id: 'risk', name: 'Risk Mitigation', icon: Shield, color: 'purple' },
     { id: 'cx', name: 'Customer Experience', icon: Users, color: 'orange' }
   ];
+  
+  const valueDrivers = allValueDrivers.filter(d => config.enabledDrivers.includes(d.id));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-8">
       <style>{`.slider::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #3b82f6; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: all 0.2s; } .slider::-webkit-slider-thumb:hover { transform: scale(1.2); background: #2563eb; } .slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #3b82f6; cursor: pointer; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: all 0.2s; } .slider::-moz-range-thumb:hover { transform: scale(1.2); background: #2563eb; }`}</style>
 
       <div className="max-w-7xl mx-auto">
+        <button onClick={onBack} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors">
+          <ArrowLeft className="w-4 h-4" />
+          <span className="text-sm font-medium">Change Model</span>
+        </button>
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Contentful Value ROI Calculator</h1>
-          <p className="text-gray-600">Calculate business impact across four value drivers</p>
+          <p className="text-gray-600">{config.name} — Calculate business impact across key value drivers</p>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
@@ -1381,10 +1483,10 @@ export default function App() {
             <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
               <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Value Driver Breakdown</h3>
               <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg"><div className="flex items-center gap-2"><TrendingUp className="w-5 h-5 text-green-600" /><span className="font-medium text-gray-900">Revenue Growth</span></div><span className="text-lg font-bold text-green-600">{formatCurrency(revenue.totalLift)}</span></div>
-                <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg"><div className="flex items-center gap-2"><Zap className="w-5 h-5 text-blue-600" /><span className="font-medium text-gray-900">Efficiency</span></div><span className="text-lg font-bold text-blue-600">{formatCurrency(efficiency.totalSavings)}</span></div>
-                <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg"><div className="flex items-center gap-2"><Shield className="w-5 h-5 text-purple-600" /><span className="font-medium text-gray-900">Risk Mitigation</span></div><span className="text-lg font-bold text-purple-600">{formatCurrency(risk.totalRiskReduction)}</span></div>
-                <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg"><div className="flex items-center gap-2"><Users className="w-5 h-5 text-orange-600" /><span className="font-medium text-gray-900">Customer Experience</span></div><span className="text-lg font-bold text-orange-600">{formatCurrency(cx.totalCXValue)}</span></div>
+                {config.enabledDrivers.includes('revenue') && <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg"><div className="flex items-center gap-2"><TrendingUp className="w-5 h-5 text-green-600" /><span className="font-medium text-gray-900">Revenue Growth</span></div><span className="text-lg font-bold text-green-600">{formatCurrency(revenue.totalLift)}</span></div>}
+                {config.enabledDrivers.includes('efficiency') && <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg"><div className="flex items-center gap-2"><Zap className="w-5 h-5 text-blue-600" /><span className="font-medium text-gray-900">Efficiency</span></div><span className="text-lg font-bold text-blue-600">{formatCurrency(efficiency.totalSavings)}</span></div>}
+                {config.enabledDrivers.includes('risk') && <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg"><div className="flex items-center gap-2"><Shield className="w-5 h-5 text-purple-600" /><span className="font-medium text-gray-900">Risk Mitigation</span></div><span className="text-lg font-bold text-purple-600">{formatCurrency(risk.totalRiskReduction)}</span></div>}
+                {config.enabledDrivers.includes('cx') && <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg"><div className="flex items-center gap-2"><Users className="w-5 h-5 text-orange-600" /><span className="font-medium text-gray-900">Customer Experience</span></div><span className="text-lg font-bold text-orange-600">{formatCurrency(cx.totalCXValue)}</span></div>}
               </div>
             </div>
 
