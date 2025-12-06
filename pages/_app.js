@@ -1,5 +1,6 @@
 import '../styles/globals.css'
 import Image from 'next/image'
+import { Analytics } from '@vercel/analytics/react'
 
 export default function MyApp({ Component, pageProps }) {
   return (
@@ -16,6 +17,7 @@ export default function MyApp({ Component, pageProps }) {
       <main>
         <Component {...pageProps} />
       </main>
+      <Analytics />
     </div>
   )
 }
