@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DollarSign, TrendingUp, Users, Shield, Zap, Calculator } from 'lucide-react';
+import { DollarSign, TrendingUp, Users, Shield, Zap, Calculator, Download } from 'lucide-react';
 
 export default function App() {
   const [valueDriver, setValueDriver] = useState('revenue');
@@ -113,6 +113,52 @@ export default function App() {
 
   const formatNumber = (num) => {
     return new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(num);
+  };
+
+  const exportToCSV = () => {
+    const inputLabels = {
+      monthlyVisitors: 'Monthly Website Visitors',
+      currentConversionRate: 'Current Conversion Rate (%)',
+      avgRevenuePerConversion: 'Avg Revenue per Conversion ($)',
+      campaignLaunchTime: 'Campaign Launch Time (Days)',
+      developerHourlyRate: 'Developer Hourly Rate ($)',
+      monthlyDevHoursOnContent: 'Monthly Dev Hours on Content',
+      numberOfCMS: 'Number of CMS Systems',
+      cmsMaintenanceCostPerYear: 'Annual CMS Maintenance Cost ($)',
+      marketingTeamSize: 'Marketing Team Size',
+      downtimeHoursPerYear: 'Downtime Hours per Year',
+      hourlyRevenueLoss: 'Hourly Revenue Loss ($)',
+      complianceAuditCost: 'Annual Compliance Audit Cost ($)',
+      securityIncidentsPerYear: 'Security Incidents per Year',
+      incidentCost: 'Cost per Security Incident ($)',
+      currentBounceRate: 'Current Bounce Rate (%)',
+      avgSessionDuration: 'Avg Session Duration (min)',
+      customerSatisfactionScore: 'Customer Satisfaction Score (%)',
+      repeatCustomerRate: 'Repeat Customer Rate (%)',
+      implementationCost: 'Implementation Cost ($)',
+      annualLicenseCost: 'Annual License Cost ($)',
+      conversionRateIncrease: 'Expected Conversion Increase (%)',
+      timeToMarketReduction: 'Time-to-Market Reduction (%)',
+      devEfficiencyGain: 'Developer Efficiency Gain (%)',
+      downtimeReduction: 'Downtime Reduction (%)',
+      cxImprovement: 'Expected CX Improvement (%)'
+    };
+
+    const csvRows = [
+      ['Input Parameter', 'Value'],
+      ...Object.entries(inputs).map(([key, value]) => [inputLabels[key] || key, value])
+    ];
+
+    const csvContent = csvRows.map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'contentful-roi-inputs.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const SliderInput = ({ label, value, onChange, min, max, step, prefix = '', suffix = '', helper, decimals }) => (
@@ -294,6 +340,16 @@ export default function App() {
           <p className="text-gray-600 text-sm leading-relaxed">
             <strong>Key Differentiators:</strong> Composable API-first platform • Native personalization & experimentation • 110+ marketplace integrations • Powers 30% of Fortune 500 • ISO 27001 & SOC 2 Type II certified
           </p>
+        </div>
+
+        <div className="mt-8 flex justify-center">
+          <button
+            onClick={exportToCSV}
+            className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg transition-all hover:shadow-xl"
+          >
+            <Download className="w-5 h-5" />
+            Export Inputs to CSV
+          </button>
         </div>
       </div>
     </div>
