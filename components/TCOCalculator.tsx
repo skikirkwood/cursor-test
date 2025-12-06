@@ -784,7 +784,7 @@ export default function App() {
               <div class="stat-desc">Return on total investment including implementation and licensing</div>
             </div>
             <div class="stat-item">
-              <div class="stat-value">${paybackMonths.toFixed(0)} months</div>
+              <div class="stat-value">${Math.round(paybackMonths) === 0 ? paybackMonths.toFixed(1) : paybackMonths.toFixed(0)} months</div>
               <div class="stat-label">Payback Period</div>
               <div class="stat-desc">Time to recover initial implementation investment</div>
             </div>
@@ -1120,7 +1120,7 @@ export default function App() {
               <div class="stat-desc">Total value minus costs</div>
             </div>
             <div class="stat-item">
-              <div class="stat-value">${paybackMonths.toFixed(0)} months</div>
+              <div class="stat-value">${Math.round(paybackMonths) === 0 ? paybackMonths.toFixed(1) : paybackMonths.toFixed(0)} months</div>
               <div class="stat-label">Payback</div>
               <div class="stat-desc">Time to recover investment</div>
             </div>
