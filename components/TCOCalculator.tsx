@@ -171,17 +171,27 @@ export default function App() {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contentful Business Case</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --ctfl-blue: #0286FF;
+      --ctfl-green: #00D47E;
+      --ctfl-yellow: #FFDA00;
+      --ctfl-orange: #E65021;
+      --ctfl-gray: #D9DBDD;
+      --ctfl-dark: #1A1A1A;
+      --ctfl-bg: #F7F8F9;
+    }
+    
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     html, body {
       height: 100%;
       overflow: hidden;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #0f172a;
-      color: #1e293b;
-      line-height: 1.6;
+      font-family: 'Red Hat Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--ctfl-bg);
+      color: var(--ctfl-dark);
+      line-height: 1.5;
     }
     
     .slideshow {
@@ -196,12 +206,14 @@ export default function App() {
       left: 0;
       width: 100%;
       height: 100%;
-      padding: 60px 80px;
+      padding: 50px 70px;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
-      background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+      background: white;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
     
     .slide.active {
@@ -210,214 +222,329 @@ export default function App() {
     }
     
     .logo {
-      position: absolute;
-      top: 40px;
-      left: 60px;
-      height: 36px;
-      z-index: 10;
+      height: 32px;
+      margin-bottom: 40px;
     }
     
-    .title-slide {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
-      color: white;
-    }
-    
-    .title-slide .logo { filter: brightness(0) invert(1); }
-    
-    .title-slide h1 {
-      font-size: 56px;
-      font-weight: 800;
+    .eyebrow {
+      display: inline-block;
+      padding: 8px 20px;
+      border: 2px solid var(--ctfl-dark);
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 500;
       margin-bottom: 24px;
-      background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
     }
     
-    .title-slide .subtitle {
-      font-size: 24px;
-      opacity: 0.9;
-      max-width: 600px;
-    }
-    
-    .title-slide .date {
-      margin-top: 60px;
-      font-size: 16px;
-      opacity: 0.7;
+    h1 {
+      font-size: 52px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--ctfl-dark);
+      margin-bottom: 16px;
     }
     
     h2 {
-      font-size: 42px;
+      font-size: 44px;
       font-weight: 700;
-      margin-bottom: 40px;
-      color: #0f172a;
-    }
-    
-    h3 {
-      font-size: 24px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      color: #334155;
-    }
-    
-    .content-area {
-      margin-top: 80px;
-      max-width: 1200px;
-    }
-    
-    .metric-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 24px;
-      margin-bottom: 40px;
-    }
-    
-    .metric-card {
-      background: white;
-      border-radius: 16px;
-      padding: 32px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    }
-    
-    .metric-card.highlight {
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: white;
-    }
-    
-    .metric-label {
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      opacity: 0.7;
-      margin-bottom: 8px;
-    }
-    
-    .metric-value {
-      font-size: 36px;
-      font-weight: 700;
-    }
-    
-    .breakdown-list {
-      background: white;
-      border-radius: 16px;
-      padding: 32px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    }
-    
-    .breakdown-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 16px 0;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    
-    .breakdown-item:last-child { border-bottom: none; }
-    
-    .breakdown-item .label { color: #64748b; }
-    .breakdown-item .value { font-weight: 600; color: #0f172a; }
-    
-    .proof-points {
-      background: #eff6ff;
-      border-left: 4px solid #3b82f6;
-      border-radius: 0 12px 12px 0;
-      padding: 24px 32px;
-      margin-top: 32px;
-    }
-    
-    .proof-points h4 {
-      color: #1e40af;
-      font-weight: 600;
+      line-height: 1.15;
+      color: var(--ctfl-dark);
       margin-bottom: 12px;
     }
     
-    .proof-points ul {
-      list-style: none;
-      color: #1e3a8a;
+    .subtitle {
+      font-size: 22px;
+      font-weight: 400;
+      color: #666;
+      margin-bottom: 32px;
     }
     
-    .proof-points li {
-      padding: 6px 0;
+    .slide-content {
+      flex: 1;
+      display: flex;
     }
     
-    .proof-points li::before {
-      content: "✓ ";
-      color: #10b981;
-      font-weight: bold;
+    .content-left {
+      flex: 1;
+      padding-right: 60px;
     }
     
+    .content-right {
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    
+    /* Geometric pattern for title slides */
+    .geo-pattern {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 45%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(7, 1fr);
+      gap: 8px;
+      padding: 20px;
+      overflow: hidden;
+    }
+    
+    .geo-shape {
+      border-radius: 50px;
+    }
+    
+    .geo-circle { border-radius: 50%; }
+    .geo-pill { border-radius: 50px; }
+    .geo-half { border-radius: 0 100px 100px 0; }
+    .geo-half-left { border-radius: 100px 0 0 100px; }
+    
+    .bg-blue { background: var(--ctfl-blue); }
+    .bg-green { background: var(--ctfl-green); }
+    .bg-yellow { background: var(--ctfl-yellow); }
+    .bg-orange { background: var(--ctfl-orange); }
+    .bg-gray { background: var(--ctfl-gray); }
+    
+    /* Stats sidebar */
+    .stats-sidebar {
+      background: var(--ctfl-blue);
+      color: white;
+      padding: 40px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 40px;
+      min-height: 100%;
+    }
+    
+    .stat-item {
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    
+    .stat-label {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    
+    .stat-desc {
+      font-size: 13px;
+      opacity: 0.85;
+      line-height: 1.4;
+    }
+    
+    /* Bullet list */
+    .bullet-list {
+      list-style: disc;
+      padding-left: 24px;
+      font-size: 18px;
+      line-height: 1.8;
+      color: var(--ctfl-dark);
+    }
+    
+    .bullet-list li {
+      margin-bottom: 12px;
+    }
+    
+    /* Colorful bottom strip */
+    .color-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 20px 0;
+      margin-top: auto;
+    }
+    
+    .strip-shape {
+      height: 24px;
+      flex-shrink: 0;
+    }
+    
+    .strip-pill { width: 60px; border-radius: 12px; }
+    .strip-circle { width: 24px; border-radius: 50%; }
+    .strip-wide { width: 100px; border-radius: 12px; }
+    .strip-arrow { width: 20px; font-size: 18px; color: var(--ctfl-gray); }
+    
+    /* Footer */
+    .slide-footer {
+      font-size: 13px;
+      color: #888;
+      padding-top: 20px;
+    }
+    
+    /* Summary cards */
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 20px;
-      margin-bottom: 40px;
+      margin: 24px 0;
     }
     
     .summary-card {
-      text-align: center;
-      padding: 24px;
+      background: var(--ctfl-bg);
       border-radius: 12px;
+      padding: 24px;
     }
     
-    .summary-card.green { background: linear-gradient(135deg, #dcfce7, #bbf7d0); }
-    .summary-card.blue { background: linear-gradient(135deg, #dbeafe, #bfdbfe); }
-    .summary-card.purple { background: linear-gradient(135deg, #f3e8ff, #e9d5ff); }
-    .summary-card.orange { background: linear-gradient(135deg, #ffedd5, #fed7aa); }
-    
-    .summary-card .icon { font-size: 32px; margin-bottom: 12px; }
-    .summary-card .name { font-size: 14px; color: #64748b; margin-bottom: 4px; }
-    .summary-card .amount { font-size: 24px; font-weight: 700; }
-    
-    .summary-card.green .amount { color: #059669; }
-    .summary-card.blue .amount { color: #2563eb; }
-    .summary-card.purple .amount { color: #7c3aed; }
-    .summary-card.orange .amount { color: #ea580c; }
-    
-    .investment-table {
-      background: white;
-      border-radius: 16px;
-      padding: 32px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    .summary-card .label {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
     }
     
-    .investment-row {
+    .summary-card .value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--ctfl-dark);
+    }
+    
+    .summary-card.highlight {
+      background: var(--ctfl-blue);
+      color: white;
+    }
+    
+    .summary-card.highlight .label {
+      color: rgba(255,255,255,0.8);
+    }
+    
+    .summary-card.highlight .value {
+      color: white;
+    }
+    
+    /* Value driver cards row */
+    .driver-cards {
+      display: flex;
+      gap: 16px;
+      margin: 24px 0;
+    }
+    
+    .driver-card {
+      flex: 1;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    
+    .driver-card .icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    
+    .driver-card .name {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    
+    .driver-card .amount {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    
+    .driver-card.green { background: #E8F9F0; }
+    .driver-card.green .amount { color: #00875A; }
+    .driver-card.blue { background: #E6F3FF; }
+    .driver-card.blue .amount { color: var(--ctfl-blue); }
+    .driver-card.orange { background: #FFF0E6; }
+    .driver-card.orange .amount { color: var(--ctfl-orange); }
+    .driver-card.yellow { background: #FFFBE6; }
+    .driver-card.yellow .amount { color: #B8860B; }
+    
+    /* Breakdown rows */
+    .breakdown-section {
+      background: var(--ctfl-bg);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 20px 0;
+    }
+    
+    .breakdown-row {
       display: flex;
       justify-content: space-between;
-      padding: 16px 0;
-      border-bottom: 1px solid #e2e8f0;
+      padding: 12px 0;
+      border-bottom: 1px solid #E5E7EB;
+      font-size: 16px;
     }
     
-    .investment-row.total {
+    .breakdown-row:last-child {
       border-bottom: none;
-      border-top: 2px solid #0f172a;
-      margin-top: 8px;
-      padding-top: 24px;
-      font-weight: 700;
-      font-size: 20px;
     }
     
+    .breakdown-row .label {
+      color: #666;
+    }
+    
+    .breakdown-row .value {
+      font-weight: 600;
+      color: var(--ctfl-dark);
+    }
+    
+    .breakdown-row.total {
+      border-top: 2px solid var(--ctfl-dark);
+      border-bottom: none;
+      margin-top: 8px;
+      padding-top: 16px;
+      font-weight: 700;
+    }
+    
+    /* Proof points */
+    .proof-section {
+      background: #E6F3FF;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-top: 20px;
+    }
+    
+    .proof-section h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ctfl-blue);
+      margin-bottom: 12px;
+    }
+    
+    .proof-section ul {
+      list-style: none;
+      font-size: 15px;
+      color: #1A5FB4;
+    }
+    
+    .proof-section li {
+      padding: 4px 0;
+    }
+    
+    .proof-section li::before {
+      content: "✓ ";
+      color: var(--ctfl-green);
+      font-weight: bold;
+    }
+    
+    /* CTA section */
     .cta-section {
-      text-align: center;
-      margin-top: 40px;
-      padding: 40px;
-      background: linear-gradient(135deg, #0f172a, #1e3a5f);
-      border-radius: 20px;
+      background: var(--ctfl-blue);
       color: white;
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      margin-top: 24px;
     }
     
     .cta-section h3 {
-      color: white;
       font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 12px;
     }
     
     .cta-section p {
+      font-size: 16px;
       opacity: 0.9;
-      max-width: 600px;
-      margin: 0 auto;
     }
     
     /* Navigation Controls */
@@ -426,21 +553,21 @@ export default function App() {
       bottom: 0;
       left: 0;
       right: 0;
-      height: 120px;
+      height: 100px;
       z-index: 100;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-end;
-      padding-bottom: 30px;
+      padding-bottom: 20px;
     }
     
     .nav-controls {
       display: flex;
       align-items: center;
-      gap: 20px;
-      background: rgba(15, 23, 42, 0.9);
-      padding: 12px 24px;
+      gap: 16px;
+      background: rgba(26, 26, 26, 0.9);
+      padding: 10px 20px;
       border-radius: 50px;
       backdrop-filter: blur(10px);
       opacity: 1;
@@ -460,13 +587,13 @@ export default function App() {
     }
     
     .nav-btn {
-      width: 48px;
-      height: 48px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       border: none;
-      background: #3b82f6;
+      background: var(--ctfl-blue);
       color: white;
-      font-size: 20px;
+      font-size: 18px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -475,51 +602,51 @@ export default function App() {
     }
     
     .nav-btn:hover:not(:disabled) {
-      background: #2563eb;
+      background: #0066CC;
       transform: scale(1.1);
     }
     
     .nav-btn:disabled {
-      background: #475569;
+      background: #666;
       cursor: not-allowed;
       opacity: 0.5;
     }
     
     .slide-indicator {
       display: flex;
-      gap: 8px;
+      gap: 6px;
     }
     
     .dot {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: #475569;
+      background: #666;
       cursor: pointer;
       transition: all 0.2s ease;
     }
     
     .dot.active {
-      background: #3b82f6;
-      transform: scale(1.2);
+      background: var(--ctfl-blue);
+      transform: scale(1.3);
     }
     
     .dot:hover {
-      background: #64748b;
+      background: #888;
     }
     
     .slide-counter {
       color: white;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
-      min-width: 60px;
+      min-width: 50px;
       text-align: center;
     }
     
     .keyboard-hint {
-      color: rgba(255,255,255,0.5);
-      font-size: 12px;
-      margin-bottom: 10px;
+      color: rgba(255,255,255,0.6);
+      font-size: 11px;
+      margin-bottom: 8px;
       opacity: 1;
       transition: opacity 0.3s ease;
     }
@@ -531,303 +658,453 @@ export default function App() {
     .nav-wrapper:hover .keyboard-hint.hidden {
       opacity: 1;
     }
-    
-    .title-slide ~ .nav-wrapper .nav-controls {
-      background: rgba(255,255,255,0.1);
-    }
   </style>
 </head>
 <body>
   <div class="slideshow">
     <!-- Slide 1: Title -->
-    <div class="slide title-slide active" data-slide="0">
+    <div class="slide active" data-slide="0" style="position: relative;">
       <img src="${logoUrl}" alt="Contentful" class="logo">
-      <h1>Business Case for Contentful</h1>
-      <p class="subtitle">A comprehensive ROI analysis demonstrating the value of migrating to a modern, composable content platform</p>
-      <p class="date">Generated on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+      <div class="eyebrow">${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
+      <h1>Business Case<br>for Contentful</h1>
+      <p class="subtitle">ROI Analysis & Value Assessment</p>
+      
+      <div class="geo-pattern">
+        <div class="geo-shape geo-pill bg-green" style="grid-column: span 2;"></div>
+        <div class="geo-shape geo-circle bg-gray"></div>
+        <div class="geo-shape geo-circle bg-yellow"></div>
+        <div class="geo-shape geo-circle bg-orange" style="width: 20px; height: 20px;"></div>
+        <div class="geo-shape geo-circle bg-blue"></div>
+        <div class="geo-shape geo-pill bg-gray" style="grid-column: span 2;"></div>
+        <div class="geo-shape geo-circle bg-green"></div>
+        <div class="geo-shape geo-circle bg-gray"></div>
+        <div class="geo-shape geo-pill bg-yellow" style="grid-column: span 3;"></div>
+        <div class="geo-shape geo-circle bg-gray"></div>
+        <div class="geo-shape geo-circle bg-blue"></div>
+        <div class="geo-shape geo-half bg-blue"></div>
+        <div class="geo-shape geo-circle bg-gray"></div>
+        <div class="geo-shape geo-pill bg-gray" style="grid-column: span 2;"></div>
+        <div class="geo-shape geo-circle bg-yellow"></div>
+        <div class="geo-shape geo-circle bg-green"></div>
+        <div class="geo-shape geo-circle bg-gray"></div>
+        <div class="geo-shape geo-half bg-orange"></div>
+        <div class="geo-shape geo-circle bg-blue"></div>
+        <div class="geo-shape geo-circle bg-gray"></div>
+        <div class="geo-shape geo-pill bg-green" style="grid-column: span 2;"></div>
+        <div class="geo-shape geo-circle bg-yellow"></div>
+        <div class="geo-shape geo-circle bg-gray"></div>
+        <div class="geo-shape geo-circle bg-orange"></div>
+        <div class="geo-shape geo-half-left bg-blue"></div>
+        <div class="geo-shape geo-circle bg-gray"></div>
+        <div class="geo-shape geo-pill bg-yellow" style="grid-column: span 2;"></div>
+      </div>
+      
+      <div class="slide-footer" style="margin-top: auto;">© 2025 Contentful</div>
     </div>
 
     <!-- Slide 2: Executive Summary -->
     <div class="slide" data-slide="1">
       <img src="${logoUrl}" alt="Contentful" class="logo">
-      <div class="content-area">
-        <h2>Executive Summary</h2>
-        <div class="metric-grid">
-          <div class="metric-card highlight">
-            <div class="metric-label">3-Year Total Benefit</div>
-            <div class="metric-value">${formatCurrency(threeYearBenefit)}</div>
+      <div class="slide-content">
+        <div class="content-left">
+          <div class="eyebrow">Executive Summary</div>
+          <h2>Total Business Impact</h2>
+          <p class="subtitle">3-year projected value from Contentful implementation</p>
+          
+          <div class="summary-grid">
+            <div class="summary-card highlight">
+              <div class="label">3-Year Total Benefit</div>
+              <div class="value">${formatCurrency(threeYearBenefit)}</div>
+            </div>
+            <div class="summary-card highlight">
+              <div class="label">Return on Investment</div>
+              <div class="value">${roi.toFixed(0)}%</div>
+            </div>
+            <div class="summary-card">
+              <div class="label">Annual Benefit</div>
+              <div class="value">${formatCurrency(totalAnnualBenefit)}</div>
+            </div>
+            <div class="summary-card">
+              <div class="label">Payback Period</div>
+              <div class="value">${paybackMonths.toFixed(1)} mo</div>
+            </div>
           </div>
-          <div class="metric-card highlight">
-            <div class="metric-label">Return on Investment</div>
-            <div class="metric-value">${roi.toFixed(0)}%</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Annual Benefit</div>
-            <div class="metric-value">${formatCurrency(totalAnnualBenefit)}</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Payback Period</div>
-            <div class="metric-value">${paybackMonths.toFixed(1)} months</div>
+          
+          <div class="driver-cards">
+            <div class="driver-card green">
+              <div class="icon">📈</div>
+              <div class="name">Revenue</div>
+              <div class="amount">${formatCurrency(revenue.totalLift)}</div>
+            </div>
+            <div class="driver-card blue">
+              <div class="icon">⚡</div>
+              <div class="name">Efficiency</div>
+              <div class="amount">${formatCurrency(efficiency.totalSavings)}</div>
+            </div>
+            <div class="driver-card orange">
+              <div class="icon">🛡️</div>
+              <div class="name">Risk</div>
+              <div class="amount">${formatCurrency(risk.totalRiskReduction)}</div>
+            </div>
+            <div class="driver-card yellow">
+              <div class="icon">👥</div>
+              <div class="name">CX</div>
+              <div class="amount">${formatCurrency(cx.totalCXValue)}</div>
+            </div>
           </div>
         </div>
-        <div class="summary-grid">
-          <div class="summary-card green">
-            <div class="icon">📈</div>
-            <div class="name">Revenue Growth</div>
-            <div class="amount">${formatCurrency(revenue.totalLift)}</div>
-          </div>
-          <div class="summary-card blue">
-            <div class="icon">⚡</div>
-            <div class="name">Efficiency</div>
-            <div class="amount">${formatCurrency(efficiency.totalSavings)}</div>
-          </div>
-          <div class="summary-card purple">
-            <div class="icon">🛡️</div>
-            <div class="name">Risk Mitigation</div>
-            <div class="amount">${formatCurrency(risk.totalRiskReduction)}</div>
-          </div>
-          <div class="summary-card orange">
-            <div class="icon">👥</div>
-            <div class="name">Customer Experience</div>
-            <div class="amount">${formatCurrency(cx.totalCXValue)}</div>
+        <div class="content-right">
+          <div class="stats-sidebar">
+            <div class="stat-item">
+              <div class="stat-value">${roi.toFixed(0)}%</div>
+              <div class="stat-label">3-Year ROI</div>
+              <div class="stat-desc">Return on total investment including implementation and licensing</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${paybackMonths.toFixed(0)}mo</div>
+              <div class="stat-label">Payback Period</div>
+              <div class="stat-desc">Time to recover initial implementation investment</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${formatCurrency(netBenefit)}</div>
+              <div class="stat-label">Net Benefit</div>
+              <div class="stat-desc">Total 3-year benefit minus all costs</div>
+            </div>
           </div>
         </div>
       </div>
+      <div class="slide-footer">© 2025 Contentful</div>
     </div>
 
     <!-- Slide 3: Revenue Growth -->
     <div class="slide" data-slide="2">
       <img src="${logoUrl}" alt="Contentful" class="logo">
-      <div class="content-area">
-        <h2>Revenue Growth</h2>
-        <h3>Accelerating Business Performance</h3>
-        <p style="color: #64748b; margin-bottom: 32px; max-width: 800px;">
-          Disconnected content systems and reliance on IT stall campaign launches and make personalization hard. 
-          Contentful brings all content into an API-first hub and gives marketers self-serve tools to build, test, and tailor experiences quickly.
-        </p>
-        <div class="metric-grid">
-          <div class="metric-card highlight">
-            <div class="metric-label">Total Revenue Impact</div>
-            <div class="metric-value">${formatCurrency(revenue.totalLift)}</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Time-to-Market Reduction</div>
-            <div class="metric-value">${inputs.timeToMarketReduction}%</div>
-          </div>
-        </div>
-        <div class="breakdown-list">
-          <h3 style="margin-bottom: 16px;">Value Breakdown</h3>
-          <div class="breakdown-item">
-            <span class="label">Conversion Rate Lift</span>
-            <span class="value">${formatCurrency(revenue.conversionLift)}</span>
-          </div>
-          <div class="breakdown-item">
-            <span class="label">Time-to-Market Value</span>
-            <span class="value">${formatCurrency(revenue.timeToMarketValue)}</span>
-          </div>
-        </div>
-        <div class="proof-points">
-          <h4>Customer Success Stories</h4>
-          <ul>
-            <li><strong>Kraft Heinz:</strong> 78% conversion rate increase</li>
-            <li><strong>Ruggable:</strong> 25% higher conversions, 7x click-through rate</li>
-            <li><strong>KFC:</strong> 43% digital sales growth</li>
+      <div class="slide-content">
+        <div class="content-left">
+          <div class="eyebrow">Revenue Growth</div>
+          <h2>Accelerating Business Performance</h2>
+          <p class="subtitle">Drive conversions and speed time-to-market with unified content delivery</p>
+          
+          <ul class="bullet-list">
+            <li>Disconnected content systems stall campaign launches and make personalization hard</li>
+            <li>Contentful brings all content into an API-first hub</li>
+            <li>Marketers get self-serve tools to build, test, and tailor experiences quickly</li>
           </ul>
+          
+          <div class="breakdown-section">
+            <div class="breakdown-row">
+              <span class="label">Conversion Rate Lift</span>
+              <span class="value">${formatCurrency(revenue.conversionLift)}</span>
+            </div>
+            <div class="breakdown-row">
+              <span class="label">Time-to-Market Value</span>
+              <span class="value">${formatCurrency(revenue.timeToMarketValue)}</span>
+            </div>
+            <div class="breakdown-row total">
+              <span class="label">Total Revenue Impact</span>
+              <span class="value" style="color: var(--ctfl-green);">${formatCurrency(revenue.totalLift)}</span>
+            </div>
+          </div>
+          
+          <div class="proof-section">
+            <h4>Customer Success Stories</h4>
+            <ul>
+              <li><strong>Kraft Heinz:</strong> 78% conversion rate increase</li>
+              <li><strong>Ruggable:</strong> 25% higher conversions, 7x CTR</li>
+              <li><strong>KFC:</strong> 43% digital sales growth</li>
+            </ul>
+          </div>
+        </div>
+        <div class="content-right">
+          <div class="stats-sidebar">
+            <div class="stat-item">
+              <div class="stat-value">${formatCurrency(revenue.totalLift)}</div>
+              <div class="stat-label">Revenue Impact</div>
+              <div class="stat-desc">Annual value from conversion improvements and faster launches</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${inputs.timeToMarketReduction}%</div>
+              <div class="stat-label">Faster Time-to-Market</div>
+              <div class="stat-desc">Reduction in campaign launch time</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${inputs.conversionRateIncrease}%</div>
+              <div class="stat-label">Conversion Increase</div>
+              <div class="stat-desc">Expected lift in conversion rates</div>
+            </div>
+          </div>
         </div>
       </div>
+      <div class="slide-footer">© 2025 Contentful</div>
     </div>
 
     <!-- Slide 4: Operational Efficiency -->
     <div class="slide" data-slide="3">
       <img src="${logoUrl}" alt="Contentful" class="logo">
-      <div class="content-area">
-        <h2>Operational Efficiency</h2>
-        <h3>Doing More with Less</h3>
-        <p style="color: #64748b; margin-bottom: 32px; max-width: 800px;">
-          Manual workflows, multiple CMSs, and developer ticket backlogs slow releases and inflate content costs. 
-          A single structured platform with a visual editor lets marketers publish independently while developers focus on higher-value work.
-        </p>
-        <div class="metric-grid">
-          <div class="metric-card highlight">
-            <div class="metric-label">Total Annual Savings</div>
-            <div class="metric-value">${formatCurrency(efficiency.totalSavings)}</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Developer Efficiency Gain</div>
-            <div class="metric-value">${inputs.devEfficiencyGain}%</div>
-          </div>
-        </div>
-        <div class="breakdown-list">
-          <h3 style="margin-bottom: 16px;">Savings Breakdown</h3>
-          <div class="breakdown-item">
-            <span class="label">Developer Cost Savings</span>
-            <span class="value">${formatCurrency(efficiency.devCostSavings)}</span>
-          </div>
-          <div class="breakdown-item">
-            <span class="label">CMS Consolidation Savings</span>
-            <span class="value">${formatCurrency(efficiency.cmsConsolidationSavings)}</span>
-          </div>
-          <div class="breakdown-item">
-            <span class="label">Marketing Productivity Gain</span>
-            <span class="value">${formatCurrency(efficiency.marketingProductivityGain)}</span>
-          </div>
-        </div>
-        <div class="proof-points">
-          <h4>Customer Success Stories</h4>
-          <ul>
-            <li><strong>Audible:</strong> 80% decrease in content production time</li>
-            <li><strong>Shiseido:</strong> 50% reduction in content costs</li>
-            <li><strong>Costa Coffee:</strong> 15 sites built in 15 minutes each</li>
+      <div class="slide-content">
+        <div class="content-left">
+          <div class="eyebrow">Operational Efficiency</div>
+          <h2>Doing More with Less</h2>
+          <p class="subtitle">Reduce costs and free developers for higher-value work</p>
+          
+          <ul class="bullet-list">
+            <li>Manual workflows and multiple CMSs slow releases and inflate content costs</li>
+            <li>A single structured platform with visual editor lets marketers publish independently</li>
+            <li>Developers focus on innovation instead of routine content updates</li>
           </ul>
+          
+          <div class="breakdown-section">
+            <div class="breakdown-row">
+              <span class="label">Developer Cost Savings</span>
+              <span class="value">${formatCurrency(efficiency.devCostSavings)}</span>
+            </div>
+            <div class="breakdown-row">
+              <span class="label">CMS Consolidation Savings</span>
+              <span class="value">${formatCurrency(efficiency.cmsConsolidationSavings)}</span>
+            </div>
+            <div class="breakdown-row">
+              <span class="label">Marketing Productivity Gain</span>
+              <span class="value">${formatCurrency(efficiency.marketingProductivityGain)}</span>
+            </div>
+            <div class="breakdown-row total">
+              <span class="label">Total Annual Savings</span>
+              <span class="value" style="color: var(--ctfl-blue);">${formatCurrency(efficiency.totalSavings)}</span>
+            </div>
+          </div>
+          
+          <div class="proof-section">
+            <h4>Customer Success Stories</h4>
+            <ul>
+              <li><strong>Audible:</strong> 80% decrease in content production time</li>
+              <li><strong>Shiseido:</strong> 50% reduction in content costs</li>
+              <li><strong>Costa Coffee:</strong> 15 sites built in 15 minutes each</li>
+            </ul>
+          </div>
+        </div>
+        <div class="content-right">
+          <div class="stats-sidebar">
+            <div class="stat-item">
+              <div class="stat-value">${formatCurrency(efficiency.totalSavings)}</div>
+              <div class="stat-label">Annual Savings</div>
+              <div class="stat-desc">Total operational cost reduction per year</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${inputs.devEfficiencyGain}%</div>
+              <div class="stat-label">Dev Efficiency Gain</div>
+              <div class="stat-desc">Reduction in developer time on content tasks</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${inputs.numberOfCMS}</div>
+              <div class="stat-label">CMS Platforms</div>
+              <div class="stat-desc">Consolidated to a single platform</div>
+            </div>
+          </div>
         </div>
       </div>
+      <div class="slide-footer">© 2025 Contentful</div>
     </div>
 
     <!-- Slide 5: Risk Mitigation -->
     <div class="slide" data-slide="4">
       <img src="${logoUrl}" alt="Contentful" class="logo">
-      <div class="content-area">
-        <h2>Risk Mitigation</h2>
-        <h3>Reducing Business & Technical Risk</h3>
-        <p style="color: #64748b; margin-bottom: 32px; max-width: 800px;">
-          Legacy stacks expose businesses to outages, traffic-spike failures, and security or compliance gaps. 
-          Contentful's cloud-native architecture delivers high availability, rapid rollback, and strong governance controls.
-        </p>
-        <div class="metric-grid">
-          <div class="metric-card highlight">
-            <div class="metric-label">Total Risk Reduction Value</div>
-            <div class="metric-value">${formatCurrency(risk.totalRiskReduction)}</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Downtime Reduction</div>
-            <div class="metric-value">${inputs.downtimeReduction}%</div>
-          </div>
-        </div>
-        <div class="breakdown-list">
-          <h3 style="margin-bottom: 16px;">Risk Reduction Breakdown</h3>
-          <div class="breakdown-item">
-            <span class="label">Downtime Cost Savings</span>
-            <span class="value">${formatCurrency(risk.downtimeSavings)}</span>
-          </div>
-          <div class="breakdown-item">
-            <span class="label">Security Incident Savings</span>
-            <span class="value">${formatCurrency(risk.securitySavings)}</span>
-          </div>
-          <div class="breakdown-item">
-            <span class="label">Compliance Efficiency</span>
-            <span class="value">${formatCurrency(risk.complianceEfficiency)}</span>
-          </div>
-        </div>
-        <div class="proof-points">
-          <h4>Enterprise-Grade Reliability</h4>
-          <ul>
-            <li><strong>Milwaukee Bucks:</strong> 2.9M app opens, zero downtime</li>
-            <li><strong>TELUS:</strong> Consolidated 11 CMS platforms to one</li>
-            <li><strong>Vodafone:</strong> 40% faster pages, zero outages</li>
-            <li>99.99% uptime SLA • ISO 27001 & SOC 2 Type II certified</li>
+      <div class="slide-content">
+        <div class="content-left">
+          <div class="eyebrow">Risk Mitigation</div>
+          <h2>Reducing Business & Technical Risk</h2>
+          <p class="subtitle">Enterprise-grade reliability with cloud-native architecture</p>
+          
+          <ul class="bullet-list">
+            <li>Legacy stacks expose businesses to outages and traffic-spike failures</li>
+            <li>Cloud-native architecture delivers high availability and rapid rollback</li>
+            <li>Strong governance controls ensure security and compliance</li>
           </ul>
+          
+          <div class="breakdown-section">
+            <div class="breakdown-row">
+              <span class="label">Downtime Cost Savings</span>
+              <span class="value">${formatCurrency(risk.downtimeSavings)}</span>
+            </div>
+            <div class="breakdown-row">
+              <span class="label">Security Incident Savings</span>
+              <span class="value">${formatCurrency(risk.securitySavings)}</span>
+            </div>
+            <div class="breakdown-row">
+              <span class="label">Compliance Efficiency</span>
+              <span class="value">${formatCurrency(risk.complianceEfficiency)}</span>
+            </div>
+            <div class="breakdown-row total">
+              <span class="label">Total Risk Reduction</span>
+              <span class="value" style="color: var(--ctfl-orange);">${formatCurrency(risk.totalRiskReduction)}</span>
+            </div>
+          </div>
+          
+          <div class="proof-section">
+            <h4>Enterprise-Grade Reliability</h4>
+            <ul>
+              <li><strong>Milwaukee Bucks:</strong> 2.9M app opens, zero downtime</li>
+              <li><strong>TELUS:</strong> Consolidated 11 CMS platforms to one</li>
+              <li><strong>Vodafone:</strong> 40% faster pages, zero outages</li>
+            </ul>
+          </div>
+        </div>
+        <div class="content-right">
+          <div class="stats-sidebar">
+            <div class="stat-item">
+              <div class="stat-value">${formatCurrency(risk.totalRiskReduction)}</div>
+              <div class="stat-label">Risk Reduction</div>
+              <div class="stat-desc">Annual value from reduced downtime and incidents</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${inputs.downtimeReduction}%</div>
+              <div class="stat-label">Downtime Reduction</div>
+              <div class="stat-desc">With 99.99% uptime SLA</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">ISO/SOC2</div>
+              <div class="stat-label">Certified</div>
+              <div class="stat-desc">ISO 27001 & SOC 2 Type II compliant</div>
+            </div>
+          </div>
         </div>
       </div>
+      <div class="slide-footer">© 2025 Contentful</div>
     </div>
 
     <!-- Slide 6: Customer Experience -->
     <div class="slide" data-slide="5">
       <img src="${logoUrl}" alt="Contentful" class="logo">
-      <div class="content-area">
-        <h2>Customer Experience</h2>
-        <h3>Elevating Engagement & Loyalty</h3>
-        <p style="color: #64748b; margin-bottom: 32px; max-width: 800px;">
-          Siloed channels, limited personalization, and sluggish pages erode engagement and push visitors away. 
-          Composable delivery, reusable components, and native personalization create fast, consistent, and relevant journeys across every touchpoint.
-        </p>
-        <div class="metric-grid">
-          <div class="metric-card highlight">
-            <div class="metric-label">Total CX Value</div>
-            <div class="metric-value">${formatCurrency(cx.totalCXValue)}</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Expected CX Improvement</div>
-            <div class="metric-value">${inputs.cxImprovement}%</div>
-          </div>
-        </div>
-        <div class="breakdown-list">
-          <h3 style="margin-bottom: 16px;">CX Value Breakdown</h3>
-          <div class="breakdown-item">
-            <span class="label">Bounce Rate Reduction Impact</span>
-            <span class="value">${formatCurrency(cx.bounceImpact)}</span>
-          </div>
-          <div class="breakdown-item">
-            <span class="label">Engagement Lift Value</span>
-            <span class="value">${formatCurrency(cx.engagementLift)}</span>
-          </div>
-          <div class="breakdown-item">
-            <span class="label">Repeat Customer Value</span>
-            <span class="value">${formatCurrency(cx.repeatCustomerLift)}</span>
-          </div>
-        </div>
-        <div class="proof-points">
-          <h4>Customer Success Stories</h4>
-          <ul>
-            <li><strong>Kraft Heinz:</strong> 30% engagement increase</li>
-            <li><strong>TELUS:</strong> 14% conversion uplift, 30% faster page loads</li>
-            <li><strong>BMW:</strong> 47% increase in test-drive bookings</li>
+      <div class="slide-content">
+        <div class="content-left">
+          <div class="eyebrow">Customer Experience</div>
+          <h2>Elevating Engagement & Loyalty</h2>
+          <p class="subtitle">Create fast, consistent, personalized journeys across every touchpoint</p>
+          
+          <ul class="bullet-list">
+            <li>Siloed channels and sluggish pages erode engagement</li>
+            <li>Composable delivery and reusable components ensure consistency</li>
+            <li>Native personalization creates relevant experiences at scale</li>
           </ul>
+          
+          <div class="breakdown-section">
+            <div class="breakdown-row">
+              <span class="label">Bounce Rate Reduction Impact</span>
+              <span class="value">${formatCurrency(cx.bounceImpact)}</span>
+            </div>
+            <div class="breakdown-row">
+              <span class="label">Engagement Lift Value</span>
+              <span class="value">${formatCurrency(cx.engagementLift)}</span>
+            </div>
+            <div class="breakdown-row">
+              <span class="label">Repeat Customer Value</span>
+              <span class="value">${formatCurrency(cx.repeatCustomerLift)}</span>
+            </div>
+            <div class="breakdown-row total">
+              <span class="label">Total CX Value</span>
+              <span class="value" style="color: #B8860B;">${formatCurrency(cx.totalCXValue)}</span>
+            </div>
+          </div>
+          
+          <div class="proof-section">
+            <h4>Customer Success Stories</h4>
+            <ul>
+              <li><strong>Kraft Heinz:</strong> 30% engagement increase</li>
+              <li><strong>TELUS:</strong> 14% conversion uplift, 30% faster loads</li>
+              <li><strong>BMW:</strong> 47% increase in test-drive bookings</li>
+            </ul>
+          </div>
+        </div>
+        <div class="content-right">
+          <div class="stats-sidebar">
+            <div class="stat-item">
+              <div class="stat-value">${formatCurrency(cx.totalCXValue)}</div>
+              <div class="stat-label">CX Value</div>
+              <div class="stat-desc">Annual value from improved customer experiences</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${inputs.cxImprovement}%</div>
+              <div class="stat-label">CX Improvement</div>
+              <div class="stat-desc">Expected engagement lift</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${inputs.currentBounceRate}%</div>
+              <div class="stat-label">Current Bounce</div>
+              <div class="stat-desc">Reduced with faster, better experiences</div>
+            </div>
+          </div>
         </div>
       </div>
+      <div class="slide-footer">© 2025 Contentful</div>
     </div>
 
     <!-- Slide 7: Investment & ROI -->
     <div class="slide" data-slide="6">
       <img src="${logoUrl}" alt="Contentful" class="logo">
-      <div class="content-area">
-        <h2>Investment & ROI Summary</h2>
-        <div class="metric-grid">
-          <div class="metric-card highlight">
-            <div class="metric-label">3-Year Net Benefit</div>
-            <div class="metric-value">${formatCurrency(netBenefit)}</div>
-          </div>
-          <div class="metric-card highlight">
-            <div class="metric-label">Return on Investment</div>
-            <div class="metric-value">${roi.toFixed(0)}%</div>
-          </div>
-        </div>
-        <div class="investment-table">
-          <h3 style="margin-bottom: 24px;">Investment Details</h3>
-          <div class="investment-row">
-            <span>Implementation Cost</span>
-            <span>${formatCurrency(inputs.implementationCost)}</span>
-          </div>
-          <div class="investment-row">
-            <span>Annual License Cost (x3 years)</span>
-            <span>${formatCurrency(inputs.annualLicenseCost * 3)}</span>
-          </div>
-          <div class="investment-row total">
-            <span>Total 3-Year Investment</span>
-            <span>${formatCurrency(totalCost)}</span>
-          </div>
-        </div>
-        <div style="margin-top: 32px;">
-          <div class="investment-table">
-            <h3 style="margin-bottom: 24px;">Benefits Summary</h3>
-            <div class="investment-row">
-              <span>Annual Total Benefit</span>
-              <span>${formatCurrency(totalAnnualBenefit)}</span>
+      <div class="slide-content">
+        <div class="content-left">
+          <div class="eyebrow">Investment Summary</div>
+          <h2>Investment & ROI</h2>
+          <p class="subtitle">Comprehensive 3-year financial analysis</p>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 24px 0;">
+            <div class="breakdown-section">
+              <h4 style="font-size: 16px; margin-bottom: 16px; color: var(--ctfl-dark);">Investment</h4>
+              <div class="breakdown-row">
+                <span class="label">Implementation</span>
+                <span class="value">${formatCurrency(inputs.implementationCost)}</span>
+              </div>
+              <div class="breakdown-row">
+                <span class="label">License (3 years)</span>
+                <span class="value">${formatCurrency(inputs.annualLicenseCost * 3)}</span>
+              </div>
+              <div class="breakdown-row total">
+                <span class="label">Total Investment</span>
+                <span class="value">${formatCurrency(totalCost)}</span>
+              </div>
             </div>
-            <div class="investment-row">
-              <span>3-Year Total Benefit</span>
-              <span>${formatCurrency(threeYearBenefit)}</span>
-            </div>
-            <div class="investment-row total" style="color: #059669;">
-              <span>3-Year Net Benefit</span>
-              <span>${formatCurrency(netBenefit)}</span>
+            
+            <div class="breakdown-section">
+              <h4 style="font-size: 16px; margin-bottom: 16px; color: var(--ctfl-dark);">Benefits</h4>
+              <div class="breakdown-row">
+                <span class="label">Annual Benefit</span>
+                <span class="value">${formatCurrency(totalAnnualBenefit)}</span>
+              </div>
+              <div class="breakdown-row">
+                <span class="label">3-Year Benefit</span>
+                <span class="value">${formatCurrency(threeYearBenefit)}</span>
+              </div>
+              <div class="breakdown-row total">
+                <span class="label">Net Benefit</span>
+                <span class="value" style="color: var(--ctfl-green);">${formatCurrency(netBenefit)}</span>
+              </div>
             </div>
           </div>
+          
+          <div class="cta-section">
+            <h3>Ready to Transform Your Content Operations?</h3>
+            <p>Contact Contentful to discuss how we can help you achieve these results for your organization.</p>
+          </div>
         </div>
-        <div class="cta-section">
-          <h3>Ready to Transform Your Content Operations?</h3>
-          <p>Contact Contentful to discuss how we can help you achieve these results for your organization.</p>
+        <div class="content-right">
+          <div class="stats-sidebar">
+            <div class="stat-item">
+              <div class="stat-value">${roi.toFixed(0)}%</div>
+              <div class="stat-label">3-Year ROI</div>
+              <div class="stat-desc">Return on total investment</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${formatCurrency(netBenefit)}</div>
+              <div class="stat-label">Net Benefit</div>
+              <div class="stat-desc">Total value minus costs</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${paybackMonths.toFixed(0)}mo</div>
+              <div class="stat-label">Payback</div>
+              <div class="stat-desc">Time to recover investment</div>
+            </div>
+          </div>
         </div>
       </div>
+      <div class="slide-footer">© 2025 Contentful</div>
     </div>
 
     <!-- Navigation Controls -->
