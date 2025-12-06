@@ -64,7 +64,7 @@ const modelConfigs = {
       repeatCustomerRate: 35,
       implementationCost: 200000,
       annualLicenseCost: 100000,
-      conversionRateIncrease: 20,
+      conversionRateIncrease: 25,
       timeToMarketReduction: 70,
       devEfficiencyGain: 55,
       downtimeReduction: 95,
