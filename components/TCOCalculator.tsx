@@ -689,7 +689,7 @@ export default function App() {
       <div class="title-content">
         <div class="eyebrow">${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
         <h1>Business Case<br>for Contentful</h1>
-        <p class="subtitle">ROI Analysis & Value Assessment</p>
+        <p class="subtitle">A comprehensive ROI analysis demonstrating the value of migrating to a modern, composable content platform</p>
       </div>
       
       <div class="geo-pattern">
