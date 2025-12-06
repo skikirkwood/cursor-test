@@ -280,9 +280,9 @@ export default function App() {
     .geo-pattern {
       position: absolute;
       right: 0;
-      top: 0;
+      top: 100px;
       width: 45%;
-      height: 100%;
+      height: calc(100% - 100px);
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       grid-template-rows: repeat(7, 1fr);
