@@ -169,7 +169,6 @@ export default function App() {
                   <div className="bg-blue-50 rounded-lg p-4 mb-4">
                     <h3 className="font-semibold text-blue-900 mb-2">Revenue Growth: Accelerating Business Performance</h3>
                     <p className="text-sm text-blue-700 mb-3">Disconnected content systems and reliance on IT stall campaign launches and make personalization hard. Contentful brings all content into an API-first hub and gives marketers self-serve tools to build, test, and tailor experiences quickly.</p>
-                    <div className="text-xs text-blue-600 mb-2"><strong>Target Personas:</strong> CMOs, VPs of Marketing, Heads of Digital & eCommerce, Directors of Growth</div>
                     <div className="text-xs text-blue-600"><strong>Expected Outcomes:</strong> 25-78% conversion increase • 60-80% faster time-to-market • Higher marketing ROI</div>
                   </div>
                   <SliderInput label="Monthly Website Visitors" value={inputs.monthlyVisitors} onChange={(val) => handleInputChange('monthlyVisitors', val)} min={10000} max={500000} step={10000} />
@@ -188,7 +187,6 @@ export default function App() {
                   <div className="bg-blue-50 rounded-lg p-4 mb-4">
                     <h3 className="font-semibold text-blue-900 mb-2">Operational Efficiency: Doing More with Less</h3>
                     <p className="text-sm text-blue-700 mb-3">Manual workflows, multiple CMSs, and developer ticket backlogs slow releases and inflate content costs. A single structured platform with a visual editor lets marketers publish independently while developers focus on higher-value work.</p>
-                    <div className="text-xs text-blue-600 mb-2"><strong>Target Personas:</strong> Heads of Marketing/Web Ops, Directors/VPs of Engineering, Directors of Finance/Procurement</div>
                     <div className="text-xs text-blue-600"><strong>Expected Outcomes:</strong> 50-80% dev time reduction • CMS consolidation savings • Faster content cycles</div>
                   </div>
                   <SliderInput label="Developer Hourly Rate" value={inputs.developerHourlyRate} onChange={(val) => handleInputChange('developerHourlyRate', val)} min={75} max={250} step={5} prefix="$" />
@@ -205,7 +203,6 @@ export default function App() {
                   <div className="bg-blue-50 rounded-lg p-4 mb-4">
                     <h3 className="font-semibold text-blue-900 mb-2">Risk Mitigation: Reducing Business & Technical Risk</h3>
                     <p className="text-sm text-blue-700 mb-3">Legacy stacks expose businesses to outages, traffic-spike failures, and security or compliance gaps. Contentful's cloud-native architecture delivers high availability, rapid rollback, and strong governance controls.</p>
-                    <div className="text-xs text-blue-600 mb-2"><strong>Target Personas:</strong> CISO/CTO/CIO, Legal & Compliance Directors, Enterprise Architecture VPs</div>
                     <div className="text-xs text-blue-600"><strong>Expected Outcomes:</strong> 99.99% uptime SLA • ISO 27001 & SOC 2 certified • Zero-downtime deployments</div>
                   </div>
                   <SliderInput label="Downtime Hours per Year" value={inputs.downtimeHoursPerYear} onChange={(val) => handleInputChange('downtimeHoursPerYear', val)} min={1} max={100} step={1} />
@@ -222,7 +219,6 @@ export default function App() {
                   <div className="bg-blue-50 rounded-lg p-4 mb-4">
                     <h3 className="font-semibold text-blue-900 mb-2">Customer Experience: Elevating Engagement & Loyalty</h3>
                     <p className="text-sm text-blue-700 mb-3">Siloed channels, limited personalization, and sluggish pages erode engagement and push visitors away. Composable delivery, reusable components, and native personalization create fast, consistent, and relevant journeys across every touchpoint.</p>
-                    <div className="text-xs text-blue-600 mb-2"><strong>Target Personas:</strong> Heads of Digital Experience/UX, Heads of Personalization/CRM, CX Operations</div>
                     <div className="text-xs text-blue-600"><strong>Expected Outcomes:</strong> Reduced bounce rates • Higher NPS/CSAT • Increased repeat customers</div>
                   </div>
                   <SliderInput label="Monthly Visitors" value={inputs.monthlyVisitors} onChange={(val) => handleInputChange('monthlyVisitors', val)} min={10000} max={500000} step={10000} />
