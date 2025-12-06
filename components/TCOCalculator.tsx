@@ -226,6 +226,7 @@ export default function App() {
       bottom: 40px;
       right: 60px;
       height: 32px;
+      z-index: 50;
     }
     
     .eyebrow {
@@ -290,7 +291,7 @@ export default function App() {
       right: 0;
       top: 0;
       width: 45%;
-      height: 100%;
+      height: calc(100% - 100px);
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       grid-template-rows: repeat(7, 1fr);
@@ -319,11 +320,13 @@ export default function App() {
       background: var(--ctfl-blue);
       color: white;
       padding: 40px 30px;
+      padding-bottom: 80px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       gap: 40px;
-      min-height: 100%;
+      min-height: calc(100% - 60px);
+      border-radius: 0 0 12px 12px;
     }
     
     .stat-item {
