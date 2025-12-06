@@ -846,7 +846,7 @@ export default function App() {
     let currentSlide = 0;
     const totalSlides = 7;
     let hideTimeout;
-    const HIDE_DELAY = 3000;
+    const HIDE_DELAY = 2000;
     
     function initSlideshow() {
       const indicator = document.getElementById('slideIndicator');
