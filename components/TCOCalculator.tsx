@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DollarSign, TrendingUp, Users, Shield, Zap, Calculator, Download, Presentation, ArrowLeft } from 'lucide-react';
+import { DollarSign, TrendingUp, Users, Shield, Zap, Calculator, Download, Upload, Presentation, ArrowLeft } from 'lucide-react';
 
 export type ModelType = 'marketing' | 'ecommerce' | 'knowledge';
 
@@ -241,6 +241,65 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const importFromCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const labelToKey: Record<string, string> = {
+      'Monthly Website Visitors': 'monthlyVisitors',
+      'Current Conversion Rate (%)': 'currentConversionRate',
+      'Avg Revenue per Conversion ($)': 'avgRevenuePerConversion',
+      'Campaign Launch Time (Days)': 'campaignLaunchTime',
+      'Developer Hourly Rate ($)': 'developerHourlyRate',
+      'Monthly Dev Hours on Content': 'monthlyDevHoursOnContent',
+      'Number of CMS Systems': 'numberOfCMS',
+      'Annual CMS Maintenance Cost ($)': 'cmsMaintenanceCostPerYear',
+      'Marketing Team Size': 'marketingTeamSize',
+      'Downtime Hours per Year': 'downtimeHoursPerYear',
+      'Hourly Revenue Loss ($)': 'hourlyRevenueLoss',
+      'Annual Compliance Audit Cost ($)': 'complianceAuditCost',
+      'Security Incidents per Year': 'securityIncidentsPerYear',
+      'Cost per Security Incident ($)': 'incidentCost',
+      'Current Bounce Rate (%)': 'currentBounceRate',
+      'Avg Session Duration (min)': 'avgSessionDuration',
+      'Customer Satisfaction Score (%)': 'customerSatisfactionScore',
+      'Repeat Customer Rate (%)': 'repeatCustomerRate',
+      'Implementation Cost ($)': 'implementationCost',
+      'Annual License Cost ($)': 'annualLicenseCost',
+      'Expected Conversion Increase (%)': 'conversionRateIncrease',
+      'Time-to-Market Reduction (%)': 'timeToMarketReduction',
+      'Developer Efficiency Gain (%)': 'devEfficiencyGain',
+      'Downtime Reduction (%)': 'downtimeReduction',
+      'Expected CX Improvement (%)': 'cxImprovement'
+    };
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      const newInputs = { ...inputs };
+      
+      // Skip header row, parse each data row
+      for (let i = 1; i < lines.length; i++) {
+        const [label, valueStr] = lines[i].split(',').map(s => s.trim());
+        const key = labelToKey[label];
+        if (key && valueStr) {
+          const value = parseFloat(valueStr);
+          if (!isNaN(value)) {
+            newInputs[key] = value;
+          }
+        }
+      }
+      
+      setInputs(newInputs);
+    };
+    
+    reader.readAsText(file);
+    // Reset file input so same file can be imported again
+    event.target.value = '';
   };
 
   const generatePresentation = () => {
@@ -1533,6 +1592,16 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
             <Download className="w-5 h-5" />
             Export Inputs to CSV
           </button>
+          <label className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg transition-all hover:shadow-xl cursor-pointer">
+            <Upload className="w-5 h-5" />
+            Import Inputs from CSV
+            <input
+              type="file"
+              accept=".csv"
+              onChange={importFromCSV}
+              className="hidden"
+            />
+          </label>
           <button
             onClick={generatePresentation}
             className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-lg transition-all hover:shadow-xl"
