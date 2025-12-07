@@ -338,7 +338,9 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
           ...prevInputs,
           ...updates
         }));
-        alert(`Successfully imported ${Object.keys(updates).length} values:\n\n${imported.slice(0, 5).join('\n')}${imported.length > 5 ? `\n...and ${imported.length - 5} more` : ''}`);
+        // Show first few lines of raw CSV for debugging
+        const rawPreview = lines.slice(0, 3).join('\n');
+        alert(`Successfully imported ${Object.keys(updates).length} values.\n\nRaw CSV preview:\n${rawPreview}\n\nImported values:\n${imported.slice(0, 5).join('\n')}${imported.length > 5 ? `\n...and ${imported.length - 5} more` : ''}`);
       } else {
         alert('No valid values found in CSV. Please ensure the file has the format:\nInput Parameter,Value\nMonthly Website Visitors,300000');
       }
