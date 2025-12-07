@@ -290,7 +290,6 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
       
       // Parse CSV into updates object
       const updates: Record<string, number> = {};
-      const imported: string[] = [];
       
       // Skip header row, parse each data row
       for (let i = 1; i < lines.length; i++) {
@@ -326,7 +325,6 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
             const value = parseFloat(valueStr);
             if (!isNaN(value)) {
               updates[key] = value;
-              imported.push(`${parts[0].trim()}: ${value}`);
             }
           }
         }
@@ -338,11 +336,6 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
           ...prevInputs,
           ...updates
         }));
-        // Show first few lines of raw CSV for debugging
-        const rawPreview = lines.slice(0, 3).join('\n');
-        alert(`Successfully imported ${Object.keys(updates).length} values.\n\nRaw CSV preview:\n${rawPreview}\n\nImported values:\n${imported.slice(0, 5).join('\n')}${imported.length > 5 ? `\n...and ${imported.length - 5} more` : ''}`);
-      } else {
-        alert('No valid values found in CSV. Please ensure the file has the format:\nInput Parameter,Value\nMonthly Website Visitors,300000');
       }
     };
     
