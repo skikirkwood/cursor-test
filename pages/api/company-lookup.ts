@@ -180,10 +180,10 @@ function findIndustryBenchmarks(industry: string) {
   return industryBenchmarks.default;
 }
 
-function countCMSPlatforms(technologies: string[]): number {
+function countCMSPlatforms(technologies: (string | { name?: string })[]): number {
   if (!Array.isArray(technologies)) return 2;
   
-  const techLower = technologies.map(t => (typeof t === 'string' ? t : t.name || '').toLowerCase());
+  const techLower = technologies.map(t => (typeof t === 'string' ? t : (t as { name?: string }).name || '').toLowerCase());
   let cmsCount = 0;
   
   for (const keyword of cmsKeywords) {
