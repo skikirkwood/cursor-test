@@ -130,103 +130,46 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     setIsSearching(true);
     setCompanyData(null);
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // In production, this would call a backend API that performs web searches
-    // For now, we'll use industry-based estimates based on company size/type
-    // This could be replaced with calls to:
-    // - Clearbit API for company enrichment
-    // - SimilarWeb API for traffic data
-    // - LinkedIn API for company size
-    // - Custom backend that aggregates multiple data sources
-    
-    const normalizedName = companyName.toLowerCase();
-    
-    // Sample company data for demonstration
-    const knownCompanies: Record<string, typeof companyData> = {
-      'salesforce': {
-        name: 'Salesforce',
-        industry: 'Enterprise Software',
-        monthlyVisitors: 450000,
-        avgRevenuePerConversion: 15000,
-        currentConversionRate: 2.8,
-        currentBounceRate: 38,
-        marketingTeamSize: 45,
-        numberOfCMS: 4
-      },
-      'shopify': {
-        name: 'Shopify',
-        industry: 'E-commerce Platform',
-        monthlyVisitors: 380000,
-        avgRevenuePerConversion: 800,
-        currentConversionRate: 3.2,
-        currentBounceRate: 42,
-        marketingTeamSize: 35,
-        numberOfCMS: 3
-      },
-      'hubspot': {
-        name: 'HubSpot',
-        industry: 'Marketing Software',
-        monthlyVisitors: 320000,
-        avgRevenuePerConversion: 5000,
-        currentConversionRate: 2.5,
-        currentBounceRate: 45,
-        marketingTeamSize: 28,
-        numberOfCMS: 2
-      },
-      'nike': {
-        name: 'Nike',
-        industry: 'Retail / Apparel',
-        monthlyVisitors: 480000,
-        avgRevenuePerConversion: 120,
-        currentConversionRate: 2.1,
-        currentBounceRate: 35,
-        marketingTeamSize: 50,
-        numberOfCMS: 5
-      },
-      'netflix': {
-        name: 'Netflix',
-        industry: 'Entertainment / Streaming',
-        monthlyVisitors: 500000,
-        avgRevenuePerConversion: 180,
-        currentConversionRate: 4.5,
-        currentBounceRate: 28,
-        marketingTeamSize: 40,
-        numberOfCMS: 3
-      },
-      'adobe': {
-        name: 'Adobe',
-        industry: 'Software',
-        monthlyVisitors: 400000,
-        avgRevenuePerConversion: 3500,
-        currentConversionRate: 2.2,
-        currentBounceRate: 40,
-        marketingTeamSize: 38,
-        numberOfCMS: 4
+    try {
+      // Check if input looks like a domain
+      const isDomain = companyName.includes('.') && !companyName.includes(' ');
+      
+      const response = await fetch('/api/company-lookup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+          isDomain 
+            ? { domain: companyName } 
+            : { companyName: companyName }
+        ),
+      });
+      
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        setCompanyData({
+          name: result.data.name,
+          industry: result.data.industry,
+          monthlyVisitors: result.data.monthlyVisitors,
+          avgRevenuePerConversion: result.data.avgRevenuePerConversion,
+          currentConversionRate: result.data.currentConversionRate,
+          currentBounceRate: result.data.currentBounceRate,
+          marketingTeamSize: result.data.marketingTeamSize,
+          numberOfCMS: result.data.numberOfCMS,
+        });
+      } else {
+        // Show error state
+        console.error('Company lookup failed:', result.error);
+        setCompanyData(null);
       }
-    };
-    
-    // Check if we have data for this company
-    let foundData = knownCompanies[normalizedName];
-    
-    if (!foundData) {
-      // Generate estimates based on the company name/industry patterns
-      // In production, this would come from a real API
-      foundData = {
-        name: companyName,
-        industry: 'General',
-        monthlyVisitors: 150000 + Math.floor(Math.random() * 200000),
-        avgRevenuePerConversion: 1000 + Math.floor(Math.random() * 4000),
-        currentConversionRate: 1.5 + Math.random() * 2,
-        currentBounceRate: 35 + Math.floor(Math.random() * 20),
-        marketingTeamSize: 10 + Math.floor(Math.random() * 25),
-        numberOfCMS: 2 + Math.floor(Math.random() * 3)
-      };
+    } catch (error) {
+      console.error('Error searching company data:', error);
+      setCompanyData(null);
+    } finally {
+      setIsSearching(false);
     }
-    
-    setCompanyData(foundData);
-    setIsSearching(false);
   };
 
   const applyCompanyData = () => {
