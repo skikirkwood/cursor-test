@@ -14,7 +14,7 @@ const modelConfigs = {
     enabledDrivers: ['revenue', 'cx'],
     defaults: {
       monthlyVisitors: 100000,
-      currentConversionRate: 0.5,
+      currentConversionRate: 2.5,
       avgRevenuePerConversion: 2000,
       campaignLaunchTime: 21,
       developerHourlyRate: 150,
@@ -76,7 +76,7 @@ const modelConfigs = {
     enabledDrivers: ['efficiency', 'cx'],
     defaults: {
       monthlyVisitors: 75000,
-      currentConversionRate: 0.1,
+      currentConversionRate: 2.5,
       avgRevenuePerConversion: 500,
       campaignLaunchTime: 30,
       developerHourlyRate: 140,
@@ -1502,7 +1502,7 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
                     <div className="text-xs text-blue-600"><strong>Expected Outcomes:</strong> 25-78% conversion increase • 60-80% faster time-to-market • Higher marketing ROI</div>
                   </div>
                   <SliderInput label="Monthly Website Visitors" value={inputs.monthlyVisitors} onChange={(val) => handleInputChange('monthlyVisitors', val)} min={10000} max={500000} step={10000} />
-                  <SliderInput label="Current Conversion Rate" value={inputs.currentConversionRate} onChange={(val) => handleInputChange('currentConversionRate', val)} min={0.01} max={1} step={0.01} suffix="%" decimals={2} />
+                  <SliderInput label="Current Conversion Rate" value={inputs.currentConversionRate} onChange={(val) => handleInputChange('currentConversionRate', val)} min={0} max={5} step={0.1} suffix="%" decimals={1} />
                   <SliderInput label="Avg Revenue per Conversion" value={inputs.avgRevenuePerConversion} onChange={(val) => handleInputChange('avgRevenuePerConversion', val)} min={500} max={20000} step={500} prefix="$" />
                   <SliderInput label="Campaign Launch Time (Days)" value={inputs.campaignLaunchTime} onChange={(val) => handleInputChange('campaignLaunchTime', val)} min={7} max={90} step={1} helper="Current time to launch" />
                   <div className="border-t pt-4">
