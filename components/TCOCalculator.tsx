@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { DollarSign, TrendingUp, Users, Shield, Zap, Calculator, Download, Upload, Presentation, ArrowLeft, Settings, X, Search, Loader2, Building2 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { DollarSign, TrendingUp, Users, Shield, Zap, Calculator, Download, Upload, Presentation, ArrowLeft, Settings, X, Search, Loader2, Building2, AlertTriangle } from 'lucide-react';
 
 export type ModelType = 'marketing' | 'ecommerce' | 'knowledge';
 
@@ -121,9 +121,55 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     marketingTeamSize?: number;
     numberOfCMS?: number;
   } | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const [showUnsavedModal, setShowUnsavedModal] = useState(false);
+  const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
 
-  const handleInputChange = (field, value) => {
-    setInputs(prev => ({ ...prev, [field]: parseFloat(value) }));
+  // Track unsaved changes and warn on page unload
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
+
+  const handleInputChange = (field: string, value: number) => {
+    setInputs(prev => ({ ...prev, [field]: parseFloat(String(value)) }));
+    setIsDirty(true);
+  };
+
+  const handleBackClick = useCallback(() => {
+    if (isDirty) {
+      setPendingAction(() => onBack);
+      setShowUnsavedModal(true);
+    } else {
+      onBack();
+    }
+  }, [isDirty, onBack]);
+
+  const handleDiscardChanges = () => {
+    setShowUnsavedModal(false);
+    setIsDirty(false);
+    if (pendingAction) {
+      pendingAction();
+      setPendingAction(null);
+    }
+  };
+
+  const handleExportAndContinue = () => {
+    exportToCSV();
+    setShowUnsavedModal(false);
+    setIsDirty(false);
+    if (pendingAction) {
+      pendingAction();
+      setPendingAction(null);
+    }
   };
 
   const searchCompanyData = async (companyName: string) => {
@@ -185,6 +231,7 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
       ...(companyData.numberOfCMS && { numberOfCMS: companyData.numberOfCMS })
     }));
     
+    setIsDirty(true);
     setShowConfigureModal(false);
   };
 
@@ -316,6 +363,7 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    setIsDirty(false);
   };
 
   const importFromCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1553,7 +1601,7 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
 
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-start mb-4">
-          <button onClick={onBack} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
+          <button onClick={handleBackClick} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm font-medium">Change Model</span>
           </button>
@@ -1888,6 +1936,54 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
               >
                 Apply to Calculator
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Unsaved Changes Warning Modal */}
+      {showUnsavedModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 text-yellow-600" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Unsaved Changes</h2>
+                  <p className="text-sm text-gray-600">You have modified calculator inputs</p>
+                </div>
+              </div>
+              
+              <p className="text-gray-700 mb-6">
+                Would you like to export your data to a CSV file before leaving? This will preserve your changes so you can import them later.
+              </p>
+
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={handleExportAndContinue}
+                  className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  <Download className="w-5 h-5" />
+                  Export to CSV & Continue
+                </button>
+                <button
+                  onClick={handleDiscardChanges}
+                  className="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors"
+                >
+                  Discard Changes
+                </button>
+                <button
+                  onClick={() => {
+                    setShowUnsavedModal(false);
+                    setPendingAction(null);
+                  }}
+                  className="w-full px-4 py-3 text-gray-500 hover:text-gray-700 font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>
