@@ -1514,7 +1514,18 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     document.body.removeChild(link);
   };
 
-  const SliderInput = ({ label, value, onChange, min, max, step, prefix = '', suffix = '', helper, decimals }) => (
+  const SliderInput = ({ label, value, onChange, min, max, step, prefix = '', suffix = '', helper, decimals }: {
+    label: string;
+    value: number;
+    onChange: (val: number) => void;
+    min: number;
+    max: number;
+    step: number;
+    prefix?: string;
+    suffix?: string;
+    helper?: string;
+    decimals?: number;
+  }) => (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
         <label className="text-sm font-medium text-gray-700">{label}</label>
