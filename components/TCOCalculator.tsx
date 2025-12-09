@@ -781,7 +781,7 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     .driver-card.yellow { background: #FFFBE6; }
     .driver-card.yellow .amount { color: #B8860B; }
     
-    /* Yearly Value Chart */
+    /* Yearly Value Line Chart */
     .yearly-chart {
       margin-top: 24px;
       padding: 20px;
@@ -796,93 +796,97 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
       margin-bottom: 16px;
     }
     
-    .chart-container {
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 0;
-      height: 160px;
-      padding-bottom: 30px;
+    .line-chart-container {
       position: relative;
+      width: 100%;
+      height: 180px;
     }
     
-    .chart-bar-group {
-      flex: 0 0 auto;
-      width: 50px;
-      margin: 0 25px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    .line-chart-svg {
+      width: 100%;
       height: 100%;
-      position: relative;
     }
     
-    .chart-bar {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      position: absolute;
-      bottom: 0;
+    .chart-line {
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
     
-    .chart-segment {
-      width: 100%;
-      transition: all 0.3s ease;
+    .chart-line.benefit {
+      stroke: #00875A;
     }
     
-    .chart-segment:first-child {
-      border-radius: 6px 6px 0 0;
+    .chart-line.investment {
+      stroke: var(--ctfl-orange);
     }
     
-    .chart-segment.revenue { background: #00875A; }
-    .chart-segment.efficiency { background: var(--ctfl-blue); }
-    .chart-segment.risk { background: var(--ctfl-orange); }
-    .chart-segment.cx { background: #B8860B; }
-    
-    .chart-label {
-      position: absolute;
-      bottom: -24px;
-      font-size: 12px;
-      font-weight: 500;
-      color: #666;
+    .chart-point {
+      stroke-width: 2;
+      stroke: white;
     }
     
-    .chart-value {
-      position: absolute;
-      top: -20px;
+    .chart-point.benefit {
+      fill: #00875A;
+    }
+    
+    .chart-point.investment {
+      fill: var(--ctfl-orange);
+    }
+    
+    .chart-grid-line {
+      stroke: #E5E7EB;
+      stroke-width: 1;
+    }
+    
+    .chart-axis-label {
       font-size: 11px;
+      fill: #666;
+    }
+    
+    .chart-value-label {
+      font-size: 10px;
       font-weight: 600;
-      color: var(--ctfl-dark);
-      white-space: nowrap;
+    }
+    
+    .chart-value-label.benefit {
+      fill: #00875A;
+    }
+    
+    .chart-value-label.investment {
+      fill: var(--ctfl-orange);
     }
     
     .chart-legend {
       display: flex;
       flex-wrap: wrap;
-      gap: 16px;
-      margin-top: 12px;
+      gap: 24px;
+      margin-top: 16px;
       justify-content: center;
     }
     
     .legend-item {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 11px;
+      gap: 8px;
+      font-size: 12px;
       color: #666;
     }
     
-    .legend-dot {
-      width: 10px;
-      height: 10px;
+    .legend-line {
+      width: 24px;
+      height: 3px;
       border-radius: 2px;
     }
     
-    .legend-dot.revenue { background: #00875A; }
-    .legend-dot.efficiency { background: var(--ctfl-blue); }
-    .legend-dot.risk { background: var(--ctfl-orange); }
-    .legend-dot.cx { background: #B8860B; }
+    .legend-line.benefit {
+      background: #00875A;
+    }
+    
+    .legend-line.investment {
+      background: var(--ctfl-orange);
+    }
     
     /* Breakdown rows */
     .breakdown-section {
@@ -1190,42 +1194,86 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
           </div>
           
           <div class="yearly-chart">
-            <h4>Cumulative Value by Year</h4>
-            <div class="chart-container">
-              ${Array.from({ length: roiYears }, (_, i) => {
+            <h4>Investment vs. Cumulative Benefit</h4>
+            ${(() => {
+              // Calculate data points for both lines
+              const chartDataPoints: Array<{year: number, cumulativeBenefit: number, cumulativeInvestment: number}> = [];
+              for (let i = 0; i < roiYears; i++) {
                 const year = i + 1;
-                const cumulativeRevenue = enabledDrivers.includes('revenue') ? revenue.totalLift * year : 0;
-                const cumulativeEfficiency = enabledDrivers.includes('efficiency') ? efficiency.totalSavings * year : 0;
-                const cumulativeRisk = enabledDrivers.includes('risk') ? risk.totalRiskReduction * year : 0;
-                const cumulativeCX = enabledDrivers.includes('cx') ? cx.totalCXValue * year : 0;
-                const totalCumulative = cumulativeRevenue + cumulativeEfficiency + cumulativeRisk + cumulativeCX;
-                const maxValue = totalAnnualBenefit * roiYears;
-                const barHeight = (totalCumulative / maxValue) * 100;
-                
-                // Calculate segment heights as percentages of the bar
-                const revenueHeight = totalCumulative > 0 ? (cumulativeRevenue / totalCumulative) * barHeight : 0;
-                const efficiencyHeight = totalCumulative > 0 ? (cumulativeEfficiency / totalCumulative) * barHeight : 0;
-                const riskHeight = totalCumulative > 0 ? (cumulativeRisk / totalCumulative) * barHeight : 0;
-                const cxHeight = totalCumulative > 0 ? (cumulativeCX / totalCumulative) * barHeight : 0;
-                
-                return `
-                <div class="chart-bar-group">
-                  <div class="chart-value">${formatCurrency(totalCumulative)}</div>
-                  <div class="chart-bar" style="height: ${barHeight}%;">
-                    ${enabledDrivers.includes('cx') ? `<div class="chart-segment cx" style="height: ${cxHeight / barHeight * 100}%;"></div>` : ''}
-                    ${enabledDrivers.includes('risk') ? `<div class="chart-segment risk" style="height: ${riskHeight / barHeight * 100}%;"></div>` : ''}
-                    ${enabledDrivers.includes('efficiency') ? `<div class="chart-segment efficiency" style="height: ${efficiencyHeight / barHeight * 100}%;"></div>` : ''}
-                    ${enabledDrivers.includes('revenue') ? `<div class="chart-segment revenue" style="height: ${revenueHeight / barHeight * 100}%;"></div>` : ''}
-                  </div>
-                  <div class="chart-label">Year ${year}</div>
-                </div>`;
-              }).join('')}
-            </div>
+                const cumulativeBenefit = totalAnnualBenefit * year;
+                const cumulativeInvestment = inputs.implementationCost + (inputs.annualLicenseCost * year);
+                chartDataPoints.push({ year, cumulativeBenefit, cumulativeInvestment });
+              }
+              
+              // Find max value for scaling
+              const chartMaxValue = Math.max(
+                chartDataPoints[chartDataPoints.length - 1].cumulativeBenefit,
+                chartDataPoints[chartDataPoints.length - 1].cumulativeInvestment
+              );
+              
+              // SVG dimensions
+              const svgWidth = 500;
+              const svgHeight = 150;
+              const padTop = 20, padRight = 70, padBottom = 30, padLeft = 10;
+              const plotWidth = svgWidth - padLeft - padRight;
+              const plotHeight = svgHeight - padTop - padBottom;
+              
+              // Generate points for benefit line
+              const bPoints = chartDataPoints.map((d, i) => ({
+                x: padLeft + (i / (roiYears - 1)) * plotWidth,
+                y: padTop + plotHeight - (d.cumulativeBenefit / chartMaxValue) * plotHeight,
+                value: d.cumulativeBenefit,
+                year: d.year
+              }));
+              
+              // Generate points for investment line
+              const iPoints = chartDataPoints.map((d, i) => ({
+                x: padLeft + (i / (roiYears - 1)) * plotWidth,
+                y: padTop + plotHeight - (d.cumulativeInvestment / chartMaxValue) * plotHeight,
+                value: d.cumulativeInvestment,
+                year: d.year
+              }));
+              
+              // Create path strings
+              const bPath = bPoints.map((p, idx) => (idx === 0 ? 'M' : 'L') + ' ' + p.x + ' ' + p.y).join(' ');
+              const iPath = iPoints.map((p, idx) => (idx === 0 ? 'M' : 'L') + ' ' + p.x + ' ' + p.y).join(' ');
+              
+              // Build SVG elements
+              let svgContent = '<div class="line-chart-container">';
+              svgContent += '<svg class="line-chart-svg" viewBox="0 0 ' + svgWidth + ' ' + svgHeight + '" preserveAspectRatio="xMidYMid meet">';
+              
+              // Grid lines
+              svgContent += '<line class="chart-grid-line" x1="' + padLeft + '" y1="' + padTop + '" x2="' + (svgWidth - padRight) + '" y2="' + padTop + '"></line>';
+              svgContent += '<line class="chart-grid-line" x1="' + padLeft + '" y1="' + (padTop + plotHeight/2) + '" x2="' + (svgWidth - padRight) + '" y2="' + (padTop + plotHeight/2) + '"></line>';
+              svgContent += '<line class="chart-grid-line" x1="' + padLeft + '" y1="' + (padTop + plotHeight) + '" x2="' + (svgWidth - padRight) + '" y2="' + (padTop + plotHeight) + '"></line>';
+              
+              // Lines
+              svgContent += '<path class="chart-line benefit" d="' + bPath + '"></path>';
+              svgContent += '<path class="chart-line investment" d="' + iPath + '"></path>';
+              
+              // Benefit points and labels
+              bPoints.forEach(p => {
+                svgContent += '<circle class="chart-point benefit" cx="' + p.x + '" cy="' + p.y + '" r="5"></circle>';
+                svgContent += '<text class="chart-value-label benefit" x="' + p.x + '" y="' + (p.y - 10) + '" text-anchor="middle">' + formatCurrency(p.value) + '</text>';
+              });
+              
+              // Investment points and labels
+              iPoints.forEach(p => {
+                svgContent += '<circle class="chart-point investment" cx="' + p.x + '" cy="' + p.y + '" r="5"></circle>';
+                svgContent += '<text class="chart-value-label investment" x="' + p.x + '" y="' + (p.y + 18) + '" text-anchor="middle">' + formatCurrency(p.value) + '</text>';
+              });
+              
+              // X-axis labels
+              bPoints.forEach(p => {
+                svgContent += '<text class="chart-axis-label" x="' + p.x + '" y="' + (svgHeight - 5) + '" text-anchor="middle">Year ' + p.year + '</text>';
+              });
+              
+              svgContent += '</svg></div>';
+              return svgContent;
+            })()}
             <div class="chart-legend">
-              ${enabledDrivers.includes('revenue') ? `<div class="legend-item"><div class="legend-dot revenue"></div>Revenue Growth</div>` : ''}
-              ${enabledDrivers.includes('efficiency') ? `<div class="legend-item"><div class="legend-dot efficiency"></div>Operational Efficiency</div>` : ''}
-              ${enabledDrivers.includes('risk') ? `<div class="legend-item"><div class="legend-dot risk"></div>Risk Mitigation</div>` : ''}
-              ${enabledDrivers.includes('cx') ? `<div class="legend-item"><div class="legend-dot cx"></div>Customer Experience</div>` : ''}
+              <div class="legend-item"><div class="legend-line benefit"></div>Cumulative Benefit</div>
+              <div class="legend-item"><div class="legend-line investment"></div>Total Investment</div>
             </div>
           </div>
         </div>
