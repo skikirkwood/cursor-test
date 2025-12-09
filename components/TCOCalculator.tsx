@@ -1213,8 +1213,8 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
               
               // SVG dimensions
               const svgWidth = 500;
-              const svgHeight = 150;
-              const padTop = 20, padRight = 70, padBottom = 30, padLeft = 10;
+              const svgHeight = 170;
+              const padTop = 20, padRight = 70, padBottom = 50, padLeft = 10;
               const plotWidth = svgWidth - padLeft - padRight;
               const plotHeight = svgHeight - padTop - padBottom;
               
