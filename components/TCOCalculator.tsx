@@ -17,6 +17,7 @@ const modelConfigs = {
       currentConversionRate: 2.5,
       avgRevenuePerConversion: 2000,
       campaignLaunchTime: 21,
+      campaignsPerYear: 6,
       developerHourlyRate: 150,
       monthlyDevHoursOnContent: 80,
       numberOfCMS: 2,
@@ -47,6 +48,7 @@ const modelConfigs = {
       currentConversionRate: 2.5,
       avgRevenuePerConversion: 150,
       campaignLaunchTime: 14,
+      campaignsPerYear: 12,
       developerHourlyRate: 175,
       monthlyDevHoursOnContent: 120,
       numberOfCMS: 3,
@@ -77,6 +79,7 @@ const modelConfigs = {
       currentConversionRate: 2.5,
       avgRevenuePerConversion: 500,
       campaignLaunchTime: 30,
+      campaignsPerYear: 4,
       developerHourlyRate: 140,
       monthlyDevHoursOnContent: 200,
       numberOfCMS: 4,
@@ -275,7 +278,7 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     const newConversionRate = inputs.currentConversionRate * (1 + inputs.conversionRateIncrease / 100);
     const newConversions = annualVisitors * (newConversionRate / 100);
     const newRevenue = newConversions * inputs.avgRevenuePerConversion;
-    const timeToMarketValue = (currentRevenue / 365) * (inputs.campaignLaunchTime * inputs.timeToMarketReduction / 100) * 6;
+    const timeToMarketValue = (currentRevenue / 365) * (inputs.campaignLaunchTime * inputs.timeToMarketReduction / 100) * inputs.campaignsPerYear;
     return {
       currentRevenue,
       newRevenue,
@@ -359,6 +362,7 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
       currentConversionRate: 'Current Conversion Rate (%)',
       avgRevenuePerConversion: 'Avg Revenue per Conversion ($)',
       campaignLaunchTime: 'Campaign Launch Time (Days)',
+      campaignsPerYear: 'Major Campaigns per Year',
       developerHourlyRate: 'Developer Hourly Rate ($)',
       monthlyDevHoursOnContent: 'Monthly Dev Hours on Content',
       numberOfCMS: 'Number of CMS Systems',
@@ -409,6 +413,7 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
       'current conversion rate (%)': 'currentConversionRate',
       'avg revenue per conversion ($)': 'avgRevenuePerConversion',
       'campaign launch time (days)': 'campaignLaunchTime',
+      'major campaigns per year': 'campaignsPerYear',
       'developer hourly rate ($)': 'developerHourlyRate',
       'monthly dev hours on content': 'monthlyDevHoursOnContent',
       'number of cms systems': 'numberOfCMS',
@@ -1874,6 +1879,7 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
                   <SliderInput label="Current Conversion Rate" value={inputs.currentConversionRate} onChange={(val) => handleInputChange('currentConversionRate', val)} min={0} max={5} step={0.1} suffix="%" decimals={1} />
                   <SliderInput label="Avg Revenue per Conversion" value={inputs.avgRevenuePerConversion} onChange={(val) => handleInputChange('avgRevenuePerConversion', val)} min={500} max={20000} step={500} prefix="$" />
                   <SliderInput label="Campaign Launch Time (Days)" value={inputs.campaignLaunchTime} onChange={(val) => handleInputChange('campaignLaunchTime', val)} min={7} max={90} step={1} helper="Current time to launch" />
+                  <SliderInput label="Major Campaigns per Year" value={inputs.campaignsPerYear} onChange={(val) => handleInputChange('campaignsPerYear', val)} min={1} max={24} step={1} helper="Number of significant launches annually" />
                   <div className="border-t pt-4">
                     <SliderInput label="Expected Conversion Increase" value={inputs.conversionRateIncrease} onChange={(val) => handleInputChange('conversionRateIncrease', val)} min={0} max={100} step={5} suffix="%" helper="Conservative: 10%, Typical: 25-78%" />
                     <div className="mt-4"><SliderInput label="Time-to-Market Reduction" value={inputs.timeToMarketReduction} onChange={(val) => handleInputChange('timeToMarketReduction', val)} min={30} max={90} step={5} suffix="%" helper="Launch in days vs weeks" /></div>
