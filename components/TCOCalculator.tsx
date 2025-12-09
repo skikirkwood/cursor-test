@@ -537,7 +537,7 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     .logo {
       position: absolute;
       bottom: 40px;
-      left: 60px;
+      right: 380px;
       height: 32px;
       z-index: 50;
     }
