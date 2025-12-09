@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { DollarSign, TrendingUp, Users, Shield, Zap, Calculator, Download, Upload, Presentation, ArrowLeft, Settings, X, Search, Loader2, Building2, AlertTriangle } from 'lucide-react';
+import { DollarSign, TrendingUp, Users, Shield, Zap, Calculator, Download, Upload, Presentation, ArrowLeft, Settings, X, Search, Loader2, Building2, AlertTriangle, RotateCcw } from 'lucide-react';
 
 export type ModelType = 'marketing' | 'ecommerce' | 'knowledge';
 
@@ -123,6 +123,31 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
   const [roiYears, setRoiYears] = useState<3 | 5>(3);
 
+  const STORAGE_KEY = `tco-calculator-${model}`;
+
+  // Load saved inputs from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsedSaved = JSON.parse(saved);
+        // Merge saved values with defaults (in case new fields were added)
+        setInputs(prev => ({ ...config.defaults, ...parsedSaved }));
+      }
+    } catch (e) {
+      console.error('Failed to load saved inputs:', e);
+    }
+  }, [model]);
+
+  // Save inputs to localStorage when they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(inputs));
+    } catch (e) {
+      console.error('Failed to save inputs:', e);
+    }
+  }, [inputs, STORAGE_KEY]);
+
   // Track unsaved changes and warn on page unload
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -167,6 +192,16 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     if (pendingAction) {
       pendingAction();
       setPendingAction(null);
+    }
+  };
+
+  const resetToDefaults = () => {
+    setInputs(config.defaults);
+    setIsDirty(false);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (e) {
+      console.error('Failed to clear saved inputs:', e);
     }
   };
 
@@ -1977,6 +2012,13 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
               className="hidden"
             />
           </label>
+          <button
+            onClick={resetToDefaults}
+            className="flex items-center gap-2 px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl shadow-lg transition-all hover:shadow-xl"
+          >
+            <RotateCcw className="w-5 h-5" />
+            Reset to Defaults
+          </button>
           <button
             onClick={generatePresentation}
             className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-lg transition-all hover:shadow-xl"
