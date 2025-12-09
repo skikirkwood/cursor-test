@@ -537,7 +537,7 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     .logo {
       position: absolute;
       bottom: 40px;
-      right: 60px;
+      left: 60px;
       height: 32px;
       z-index: 50;
     }
@@ -800,14 +800,17 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     .chart-container {
       display: flex;
       align-items: flex-end;
-      gap: 12px;
+      justify-content: center;
+      gap: 0;
       height: 160px;
       padding-bottom: 30px;
       position: relative;
     }
     
     .chart-bar-group {
-      flex: 1;
+      flex: 0 0 auto;
+      width: 50px;
+      margin: 0 25px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -817,7 +820,6 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     
     .chart-bar {
       width: 100%;
-      max-width: 60px;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
