@@ -782,6 +782,107 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     .driver-card.yellow { background: #FFFBE6; }
     .driver-card.yellow .amount { color: #B8860B; }
     
+    /* Yearly Value Chart */
+    .yearly-chart {
+      margin-top: 24px;
+      padding: 20px;
+      background: var(--ctfl-bg);
+      border-radius: 12px;
+    }
+    
+    .yearly-chart h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ctfl-dark);
+      margin-bottom: 16px;
+    }
+    
+    .chart-container {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      height: 160px;
+      padding-bottom: 30px;
+      position: relative;
+    }
+    
+    .chart-bar-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      position: relative;
+    }
+    
+    .chart-bar {
+      width: 100%;
+      max-width: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      position: absolute;
+      bottom: 0;
+    }
+    
+    .chart-segment {
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+    
+    .chart-segment:first-child {
+      border-radius: 6px 6px 0 0;
+    }
+    
+    .chart-segment.revenue { background: #00875A; }
+    .chart-segment.efficiency { background: var(--ctfl-blue); }
+    .chart-segment.risk { background: var(--ctfl-orange); }
+    .chart-segment.cx { background: #B8860B; }
+    
+    .chart-label {
+      position: absolute;
+      bottom: -24px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #666;
+    }
+    
+    .chart-value {
+      position: absolute;
+      top: -20px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ctfl-dark);
+      white-space: nowrap;
+    }
+    
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 12px;
+      justify-content: center;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #666;
+    }
+    
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+    
+    .legend-dot.revenue { background: #00875A; }
+    .legend-dot.efficiency { background: var(--ctfl-blue); }
+    .legend-dot.risk { background: var(--ctfl-orange); }
+    .legend-dot.cx { background: #B8860B; }
+    
     /* Breakdown rows */
     .breakdown-section {
       background: var(--ctfl-bg);
@@ -1087,6 +1188,46 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
               <div class="name">CX</div>
               <div class="amount">${formatCurrency(cx.totalCXValue)}</div>
             </div>` : ''}
+          </div>
+          
+          <div class="yearly-chart">
+            <h4>Cumulative Value by Year</h4>
+            <div class="chart-container">
+              ${Array.from({ length: roiYears }, (_, i) => {
+                const year = i + 1;
+                const cumulativeRevenue = enabledDrivers.includes('revenue') ? revenue.totalLift * year : 0;
+                const cumulativeEfficiency = enabledDrivers.includes('efficiency') ? efficiency.totalSavings * year : 0;
+                const cumulativeRisk = enabledDrivers.includes('risk') ? risk.totalRiskReduction * year : 0;
+                const cumulativeCX = enabledDrivers.includes('cx') ? cx.totalCXValue * year : 0;
+                const totalCumulative = cumulativeRevenue + cumulativeEfficiency + cumulativeRisk + cumulativeCX;
+                const maxValue = totalAnnualBenefit * roiYears;
+                const barHeight = (totalCumulative / maxValue) * 100;
+                
+                // Calculate segment heights as percentages of the bar
+                const revenueHeight = totalCumulative > 0 ? (cumulativeRevenue / totalCumulative) * barHeight : 0;
+                const efficiencyHeight = totalCumulative > 0 ? (cumulativeEfficiency / totalCumulative) * barHeight : 0;
+                const riskHeight = totalCumulative > 0 ? (cumulativeRisk / totalCumulative) * barHeight : 0;
+                const cxHeight = totalCumulative > 0 ? (cumulativeCX / totalCumulative) * barHeight : 0;
+                
+                return `
+                <div class="chart-bar-group">
+                  <div class="chart-value">${formatCurrency(totalCumulative)}</div>
+                  <div class="chart-bar" style="height: ${barHeight}%;">
+                    ${enabledDrivers.includes('cx') ? `<div class="chart-segment cx" style="height: ${cxHeight / barHeight * 100}%;"></div>` : ''}
+                    ${enabledDrivers.includes('risk') ? `<div class="chart-segment risk" style="height: ${riskHeight / barHeight * 100}%;"></div>` : ''}
+                    ${enabledDrivers.includes('efficiency') ? `<div class="chart-segment efficiency" style="height: ${efficiencyHeight / barHeight * 100}%;"></div>` : ''}
+                    ${enabledDrivers.includes('revenue') ? `<div class="chart-segment revenue" style="height: ${revenueHeight / barHeight * 100}%;"></div>` : ''}
+                  </div>
+                  <div class="chart-label">Year ${year}</div>
+                </div>`;
+              }).join('')}
+            </div>
+            <div class="chart-legend">
+              ${enabledDrivers.includes('revenue') ? `<div class="legend-item"><div class="legend-dot revenue"></div>Revenue</div>` : ''}
+              ${enabledDrivers.includes('efficiency') ? `<div class="legend-item"><div class="legend-dot efficiency"></div>Efficiency</div>` : ''}
+              ${enabledDrivers.includes('risk') ? `<div class="legend-item"><div class="legend-dot risk"></div>Risk</div>` : ''}
+              ${enabledDrivers.includes('cx') ? `<div class="legend-item"><div class="legend-dot cx"></div>CX</div>` : ''}
+            </div>
           </div>
         </div>
         <div class="content-right">
