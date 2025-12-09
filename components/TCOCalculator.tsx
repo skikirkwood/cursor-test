@@ -29,7 +29,6 @@ const modelConfigs = {
       incidentCost: 75000,
       currentBounceRate: 55,
       avgSessionDuration: 2.5,
-      customerSatisfactionScore: 65,
       repeatCustomerRateIncrease: 10,
       implementationCost: 125000,
       annualLicenseCost: 60000,
@@ -60,7 +59,6 @@ const modelConfigs = {
       incidentCost: 150000,
       currentBounceRate: 40,
       avgSessionDuration: 4.0,
-      customerSatisfactionScore: 72,
       repeatCustomerRateIncrease: 10,
       implementationCost: 200000,
       annualLicenseCost: 100000,
@@ -91,7 +89,6 @@ const modelConfigs = {
       incidentCost: 50000,
       currentBounceRate: 35,
       avgSessionDuration: 5.0,
-      customerSatisfactionScore: 60,
       repeatCustomerRateIncrease: 10,
       implementationCost: 100000,
       annualLicenseCost: 50000,
@@ -339,7 +336,6 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
       incidentCost: 'Cost per Security Incident ($)',
       currentBounceRate: 'Current Bounce Rate (%)',
       avgSessionDuration: 'Avg Session Duration (min)',
-      customerSatisfactionScore: 'Customer Satisfaction Score (%)',
       repeatCustomerRateIncrease: 'Repeat Customer Rate Increase (%)',
       implementationCost: 'Implementation Cost ($)',
       annualLicenseCost: 'Annual License Cost ($)',
@@ -390,7 +386,6 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
       'cost per security incident ($)': 'incidentCost',
       'current bounce rate (%)': 'currentBounceRate',
       'avg session duration (min)': 'avgSessionDuration',
-      'customer satisfaction score (%)': 'customerSatisfactionScore',
       'repeat customer rate increase (%)': 'repeatCustomerRateIncrease',
       'implementation cost ($)': 'implementationCost',
       'annual license cost ($)': 'annualLicenseCost',
@@ -1893,7 +1888,6 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
                   <SliderInput label="Monthly Visitors" value={inputs.monthlyVisitors} onChange={(val) => handleInputChange('monthlyVisitors', val)} min={10000} max={500000} step={10000} />
                   <SliderInput label="Current Bounce Rate" value={inputs.currentBounceRate} onChange={(val) => handleInputChange('currentBounceRate', val)} min={20} max={80} step={1} suffix="%" />
                   <SliderInput label="Avg Session Duration (min)" value={inputs.avgSessionDuration} onChange={(val) => handleInputChange('avgSessionDuration', val)} min={1} max={15} step={0.5} />
-                  <SliderInput label="Customer Satisfaction Score" value={inputs.customerSatisfactionScore} onChange={(val) => handleInputChange('customerSatisfactionScore', val)} min={40} max={95} step={1} suffix="%" />
                   <SliderInput label="Repeat Customer Rate Increase" value={inputs.repeatCustomerRateIncrease} onChange={(val) => handleInputChange('repeatCustomerRateIncrease', val)} min={0} max={20} step={1} suffix="%" helper="Expected increase in repeat customers" />
                   <div className="border-t pt-4"><SliderInput label="Expected CX Improvement" value={inputs.cxImprovement} onChange={(val) => handleInputChange('cxImprovement', val)} min={15} max={50} step={5} suffix="%" helper="Engagement lift" /></div>
                 </>
