@@ -129,8 +129,17 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
   const [roiYears, setRoiYears] = useState<3 | 5>(3);
   const [attributionPercent, setAttributionPercent] = useState(50);
+  const [enabledDrivers, setEnabledDrivers] = useState<string[]>(config.enabledDrivers);
+
+  // Update valueDriver when enabledDrivers changes (ensure selected driver is still valid)
+  useEffect(() => {
+    if (!enabledDrivers.includes(valueDriver)) {
+      setValueDriver(enabledDrivers[0]);
+    }
+  }, [enabledDrivers, valueDriver]);
 
   const STORAGE_KEY = `tco-calculator-${model}`;
+  const DRIVERS_STORAGE_KEY = `tco-calculator-drivers-${model}`;
 
   // Load saved inputs from localStorage on mount
   useEffect(() => {
@@ -145,6 +154,30 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
       console.error('Failed to load saved inputs:', e);
     }
   }, [model]);
+
+  // Load saved enabled drivers from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedDrivers = localStorage.getItem(DRIVERS_STORAGE_KEY);
+      if (savedDrivers) {
+        const parsedDrivers = JSON.parse(savedDrivers);
+        if (Array.isArray(parsedDrivers) && parsedDrivers.length > 0) {
+          setEnabledDrivers(parsedDrivers);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load saved drivers:', e);
+    }
+  }, [model]);
+
+  // Save enabled drivers to localStorage when they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(DRIVERS_STORAGE_KEY, JSON.stringify(enabledDrivers));
+    } catch (e) {
+      console.error('Failed to save enabled drivers:', e);
+    }
+  }, [enabledDrivers, DRIVERS_STORAGE_KEY]);
 
   // Save inputs to localStorage when they change
   useEffect(() => {
@@ -344,10 +377,10 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
   const attributionFactor = model === 'marketing' ? (attributionPercent / 100) : 1;
   
   const totalAnnualBenefit = 
-    (config.enabledDrivers.includes('revenue') ? revenue.totalLift * attributionFactor : 0) + 
-    (config.enabledDrivers.includes('efficiency') ? efficiency.totalSavings : 0) + 
-    (config.enabledDrivers.includes('risk') ? risk.totalRiskReduction : 0) + 
-    (config.enabledDrivers.includes('cx') ? cx.totalCXValue * attributionFactor : 0);
+    (enabledDrivers.includes('revenue') ? revenue.totalLift * attributionFactor : 0) + 
+    (enabledDrivers.includes('efficiency') ? efficiency.totalSavings : 0) + 
+    (enabledDrivers.includes('risk') ? risk.totalRiskReduction : 0) + 
+    (enabledDrivers.includes('cx') ? cx.totalCXValue * attributionFactor : 0);
   const multiYearBenefit = totalAnnualBenefit * roiYears;
   const totalCost = inputs.implementationCost + (inputs.annualLicenseCost * roiYears);
   const netBenefit = multiYearBenefit - totalCost;
@@ -518,7 +551,6 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     
     // Build slides array - always include title, exec summary, and investment slides
     // Include only enabled value driver slides
-    const enabledDrivers = config.enabledDrivers;
     const totalSlides = 3 + enabledDrivers.length; // title + exec summary + investment + enabled drivers
     
     const htmlContent = `
@@ -1822,7 +1854,7 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     { id: 'cx', name: 'Customer Experience', icon: Users, color: 'orange' }
   ];
   
-  const valueDrivers = allValueDrivers.filter(d => config.enabledDrivers.includes(d.id));
+  const valueDrivers = allValueDrivers.filter(d => enabledDrivers.includes(d.id));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-8">
@@ -1985,10 +2017,10 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
             <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
               <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Value Driver Breakdown</h3>
               <div className="space-y-3">
-                {config.enabledDrivers.includes('revenue') && <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg"><div className="flex items-center gap-2"><TrendingUp className="w-5 h-5 text-green-600" /><span className="font-medium text-gray-900">Revenue Growth</span></div><span className="text-lg font-bold text-green-600">{formatCurrency(revenue.totalLift)}</span></div>}
-                {config.enabledDrivers.includes('efficiency') && <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg"><div className="flex items-center gap-2"><Zap className="w-5 h-5 text-blue-600" /><span className="font-medium text-gray-900">Efficiency</span></div><span className="text-lg font-bold text-blue-600">{formatCurrency(efficiency.totalSavings)}</span></div>}
-                {config.enabledDrivers.includes('risk') && <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg"><div className="flex items-center gap-2"><Shield className="w-5 h-5 text-purple-600" /><span className="font-medium text-gray-900">Risk Mitigation</span></div><span className="text-lg font-bold text-purple-600">{formatCurrency(risk.totalRiskReduction)}</span></div>}
-                {config.enabledDrivers.includes('cx') && <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg"><div className="flex items-center gap-2"><Users className="w-5 h-5 text-orange-600" /><span className="font-medium text-gray-900">Customer Experience</span></div><span className="text-lg font-bold text-orange-600">{formatCurrency(cx.totalCXValue)}</span></div>}
+                {enabledDrivers.includes('revenue') && <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg"><div className="flex items-center gap-2"><TrendingUp className="w-5 h-5 text-green-600" /><span className="font-medium text-gray-900">Revenue Growth</span></div><span className="text-lg font-bold text-green-600">{formatCurrency(revenue.totalLift)}</span></div>}
+                {enabledDrivers.includes('efficiency') && <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg"><div className="flex items-center gap-2"><Zap className="w-5 h-5 text-blue-600" /><span className="font-medium text-gray-900">Efficiency</span></div><span className="text-lg font-bold text-blue-600">{formatCurrency(efficiency.totalSavings)}</span></div>}
+                {enabledDrivers.includes('risk') && <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg"><div className="flex items-center gap-2"><Shield className="w-5 h-5 text-purple-600" /><span className="font-medium text-gray-900">Risk Mitigation</span></div><span className="text-lg font-bold text-purple-600">{formatCurrency(risk.totalRiskReduction)}</span></div>}
+                {enabledDrivers.includes('cx') && <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg"><div className="flex items-center gap-2"><Users className="w-5 h-5 text-orange-600" /><span className="font-medium text-gray-900">Customer Experience</span></div><span className="text-lg font-bold text-orange-600">{formatCurrency(cx.totalCXValue)}</span></div>}
               </div>
             </div>
 
@@ -2111,6 +2143,77 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
                   Choose the time horizon for ROI calculations and business case projections.
+                </p>
+              </div>
+
+              {/* Value Drivers Selection */}
+              <div className="border-t border-gray-200 pt-6">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Value Drivers for {config.name}
+                </label>
+                <div className="space-y-2">
+                  {[
+                    { id: 'revenue', name: 'Revenue Growth', icon: TrendingUp, color: 'green', description: 'Conversion optimization & time-to-market gains' },
+                    { id: 'efficiency', name: 'Operational Efficiency', icon: Zap, color: 'blue', description: 'Developer productivity & CMS consolidation' },
+                    { id: 'risk', name: 'Risk Mitigation', icon: Shield, color: 'purple', description: 'Uptime, security & compliance improvements' },
+                    { id: 'cx', name: 'Customer Experience', icon: Users, color: 'orange', description: 'Bounce rate, engagement & retention' }
+                  ].map((driver) => {
+                    const IconComponent = driver.icon;
+                    const isEnabled = enabledDrivers.includes(driver.id);
+                    const isDefault = config.enabledDrivers.includes(driver.id);
+                    const colorClasses: Record<string, { bg: string; border: string; text: string; icon: string }> = {
+                      green: { bg: 'bg-green-50', border: 'border-green-300', text: 'text-green-700', icon: 'text-green-600' },
+                      blue: { bg: 'bg-blue-50', border: 'border-blue-300', text: 'text-blue-700', icon: 'text-blue-600' },
+                      purple: { bg: 'bg-purple-50', border: 'border-purple-300', text: 'text-purple-700', icon: 'text-purple-600' },
+                      orange: { bg: 'bg-orange-50', border: 'border-orange-300', text: 'text-orange-700', icon: 'text-orange-600' }
+                    };
+                    const colors = colorClasses[driver.color];
+                    
+                    return (
+                      <label
+                        key={driver.id}
+                        className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                          isEnabled
+                            ? `${colors.bg} ${colors.border}`
+                            : 'bg-gray-50 border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isEnabled}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setEnabledDrivers([...enabledDrivers, driver.id]);
+                            } else {
+                              // Prevent unchecking the last driver
+                              if (enabledDrivers.length > 1) {
+                                setEnabledDrivers(enabledDrivers.filter(d => d !== driver.id));
+                              }
+                            }
+                            setIsDirty(true);
+                          }}
+                          className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                        />
+                        <IconComponent className={`w-5 h-5 ${isEnabled ? colors.icon : 'text-gray-400'}`} />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className={`font-medium ${isEnabled ? colors.text : 'text-gray-600'}`}>
+                              {driver.name}
+                            </span>
+                            {isDefault && (
+                              <span className="text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">
+                                default
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500">{driver.description}</p>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Select the value drivers most relevant to this prospect. At least one must be selected.
                 </p>
               </div>
 
