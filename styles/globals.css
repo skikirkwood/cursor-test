@@ -1,3 +1,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@media print {
+  @page {
+    margin: 1cm;
+  }
+  
+  body {
+    background: white !important;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  .bg-gradient-to-br {
+    background: white !important;
+  }
+  
+  .shadow-lg {
+    box-shadow: none !important;
+  }
+  
+  .rounded-xl {
+    border-radius: 0 !important;
+    border: 1px solid #e5e7eb !important;
+  }
+}

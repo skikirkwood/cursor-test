@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { DollarSign, TrendingUp, Users, Shield, Zap, Calculator, Download, Upload, Presentation, ArrowLeft, Settings, X, Search, Loader2, Building2, AlertTriangle, RotateCcw } from 'lucide-react';
+import { DollarSign, TrendingUp, Users, Shield, Zap, Calculator, Download, Upload, Presentation, ArrowLeft, Settings, X, Search, Loader2, Building2, AlertTriangle, RotateCcw, Share2, Printer, FileText, BarChart3 } from 'lucide-react';
 
 export type ModelType = 'marketing' | 'ecommerce' | 'knowledge';
 
@@ -137,6 +137,39 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
       setValueDriver(enabledDrivers[0]);
     }
   }, [enabledDrivers, valueDriver]);
+
+  // Load from URL params on mount (only once)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const encoded = params.get('data');
+      if (encoded) {
+        try {
+          const decoded = JSON.parse(decodeURIComponent(atob(encoded)));
+          if (decoded.model && decoded.model === model) {
+            // Only apply if model matches
+            if (decoded.inputs) {
+              setInputs(prev => ({ ...config.defaults, ...decoded.inputs }));
+            }
+            if (decoded.valueDriver) {
+              setValueDriver(decoded.valueDriver);
+            }
+            if (decoded.enabledDrivers && Array.isArray(decoded.enabledDrivers)) {
+              setEnabledDrivers(decoded.enabledDrivers);
+            }
+            if (decoded.roiYears) {
+              setRoiYears(decoded.roiYears);
+            }
+            if (decoded.attributionPercent !== undefined) {
+              setAttributionPercent(decoded.attributionPercent);
+            }
+          }
+        } catch (e) {
+          console.error('Failed to decode URL parameters', e);
+        }
+      }
+    }
+  }, []); // Only run once on mount
 
   // Reset valueDriver and enabledDrivers when model changes, then load from localStorage
   useEffect(() => {
@@ -456,6 +489,96 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     link.click();
     document.body.removeChild(link);
     setIsDirty(false);
+  };
+
+  // Export to PDF
+  const exportToPDF = async () => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      const jsPDF = (await import('jspdf')).default;
+      const doc = new jsPDF();
+      
+      doc.setFontSize(18);
+      doc.text(`Contentful ROI Calculator - ${config.name}`, 20, 20);
+      doc.setFontSize(12);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 30);
+      
+      let yPos = 45;
+      doc.setFontSize(14);
+      doc.text('Total Business Impact', 20, yPos);
+      yPos += 10;
+      doc.setFontSize(11);
+      doc.text(`Annual Benefit: ${formatCurrency(totalAnnualBenefit)}`, 20, yPos);
+      yPos += 7;
+      doc.text(`${roiYears}-Year Benefit: ${formatCurrency(multiYearBenefit)}`, 20, yPos);
+      yPos += 7;
+      doc.text(`ROI (${roiYears} Years): ${roi.toFixed(0)}%`, 20, yPos);
+      yPos += 7;
+      doc.text(`Payback Period: ${paybackMonths.toFixed(1)} months`, 20, yPos);
+      
+      yPos += 10;
+      doc.setFontSize(14);
+      doc.text('Value Driver Breakdown', 20, yPos);
+      yPos += 10;
+      doc.setFontSize(11);
+      if (enabledDrivers.includes('revenue')) {
+        doc.text(`Revenue Growth: ${formatCurrency(revenue.totalLift)}`, 20, yPos);
+        yPos += 7;
+      }
+      if (enabledDrivers.includes('efficiency')) {
+        doc.text(`Operational Efficiency: ${formatCurrency(efficiency.totalSavings)}`, 20, yPos);
+        yPos += 7;
+      }
+      if (enabledDrivers.includes('risk')) {
+        doc.text(`Risk Mitigation: ${formatCurrency(risk.totalRiskReduction)}`, 20, yPos);
+        yPos += 7;
+      }
+      if (enabledDrivers.includes('cx')) {
+        doc.text(`Customer Experience: ${formatCurrency(cx.totalCXValue)}`, 20, yPos);
+        yPos += 7;
+      }
+      
+      doc.save(`contentful-roi-${model}-${Date.now()}.pdf`);
+    } catch (error) {
+      console.error('PDF export failed:', error);
+      alert('PDF export failed. Please try again.');
+    }
+  };
+
+  // Generate shareable URL
+  const generateShareableURL = () => {
+    if (typeof window === 'undefined') return;
+    
+    const dataToShare = {
+      model,
+      inputs,
+      valueDriver,
+      enabledDrivers,
+      roiYears,
+      attributionPercent
+    };
+    
+    const encoded = btoa(encodeURIComponent(JSON.stringify(dataToShare)));
+    const url = `${window.location.origin}${window.location.pathname}?data=${encoded}`;
+    
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Shareable URL copied to clipboard!');
+    }).catch(() => {
+      // Fallback for older browsers
+      const textarea = document.createElement('textarea');
+      textarea.value = url;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      alert('Shareable URL copied to clipboard!');
+    });
+  };
+
+  // Print
+  const handlePrint = () => {
+    window.print();
   };
 
   const importFromCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -2029,8 +2152,45 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Value Driver Breakdown</h3>
-              <div className="space-y-3">
+              <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-blue-600" />
+                Value Driver Breakdown
+              </h3>
+              
+              {/* Visual Chart */}
+              <div className="mb-4 space-y-3">
+                {[
+                  { name: 'Revenue Growth', value: enabledDrivers.includes('revenue') ? revenue.totalLift : 0, color: 'bg-green-500', icon: TrendingUp, enabled: enabledDrivers.includes('revenue') },
+                  { name: 'Efficiency', value: enabledDrivers.includes('efficiency') ? efficiency.totalSavings : 0, color: 'bg-blue-500', icon: Zap, enabled: enabledDrivers.includes('efficiency') },
+                  { name: 'Risk Mitigation', value: enabledDrivers.includes('risk') ? risk.totalRiskReduction : 0, color: 'bg-purple-500', icon: Shield, enabled: enabledDrivers.includes('risk') },
+                  { name: 'Customer Experience', value: enabledDrivers.includes('cx') ? cx.totalCXValue : 0, color: 'bg-orange-500', icon: Users, enabled: enabledDrivers.includes('cx') }
+                ].filter(driver => driver.enabled).map((driver) => {
+                  const maxValue = Math.max(
+                    enabledDrivers.includes('revenue') ? revenue.totalLift : 0,
+                    enabledDrivers.includes('efficiency') ? efficiency.totalSavings : 0,
+                    enabledDrivers.includes('risk') ? risk.totalRiskReduction : 0,
+                    enabledDrivers.includes('cx') ? cx.totalCXValue : 0
+                  );
+                  const percentage = maxValue > 0 ? (driver.value / maxValue) * 100 : 0;
+                  const Icon = driver.icon;
+                  return (
+                    <div key={driver.name} className="space-y-1">
+                      <div className="flex justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          <Icon className="w-4 h-4 text-gray-600" />
+                          <span className="font-medium text-gray-700">{driver.name}</span>
+                        </div>
+                        <span className="font-bold text-gray-900">{formatCurrency(driver.value)}</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div className={`${driver.color} h-3 rounded-full transition-all duration-500`} style={{ width: `${percentage}%` }}></div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="space-y-3 border-t pt-4">
                 {enabledDrivers.includes('revenue') && <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg"><div className="flex items-center gap-2"><TrendingUp className="w-5 h-5 text-green-600" /><span className="font-medium text-gray-900">Revenue Growth</span></div><span className="text-lg font-bold text-green-600">{formatCurrency(revenue.totalLift)}</span></div>}
                 {enabledDrivers.includes('efficiency') && <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg"><div className="flex items-center gap-2"><Zap className="w-5 h-5 text-blue-600" /><span className="font-medium text-gray-900">Efficiency</span></div><span className="text-lg font-bold text-blue-600">{formatCurrency(efficiency.totalSavings)}</span></div>}
                 {enabledDrivers.includes('risk') && <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg"><div className="flex items-center gap-2"><Shield className="w-5 h-5 text-purple-600" /><span className="font-medium text-gray-900">Risk Mitigation</span></div><span className="text-lg font-bold text-purple-600">{formatCurrency(risk.totalRiskReduction)}</span></div>}
@@ -2073,17 +2233,24 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
           </p>
         </div>
 
-        <div className="mt-8 flex justify-center gap-4">
+        <div className="mt-8 flex flex-wrap justify-center gap-3 no-print">
           <button
             onClick={exportToCSV}
             className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg transition-all hover:shadow-xl"
           >
             <Download className="w-5 h-5" />
-            Export Inputs to CSV
+            Export CSV
+          </button>
+          <button
+            onClick={exportToPDF}
+            className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-lg transition-all hover:shadow-xl"
+          >
+            <FileText className="w-5 h-5" />
+            Export PDF
           </button>
           <label className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg transition-all hover:shadow-xl cursor-pointer">
             <Upload className="w-5 h-5" />
-            Import Inputs from CSV
+            Import CSV
             <input
               type="file"
               accept=".csv"
@@ -2092,18 +2259,32 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
             />
           </label>
           <button
-            onClick={resetToDefaults}
+            onClick={generateShareableURL}
+            className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl shadow-lg transition-all hover:shadow-xl"
+          >
+            <Share2 className="w-5 h-5" />
+            Share URL
+          </button>
+          <button
+            onClick={handlePrint}
             className="flex items-center gap-2 px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl shadow-lg transition-all hover:shadow-xl"
           >
+            <Printer className="w-5 h-5" />
+            Print
+          </button>
+          <button
+            onClick={resetToDefaults}
+            className="flex items-center gap-2 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl shadow-lg transition-all hover:shadow-xl"
+          >
             <RotateCcw className="w-5 h-5" />
-            Reset to Defaults
+            Reset
           </button>
           <button
             onClick={generatePresentation}
             className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-lg transition-all hover:shadow-xl"
           >
             <Presentation className="w-5 h-5" />
-            Generate Business Case
+            Business Case
           </button>
         </div>
       </div>
