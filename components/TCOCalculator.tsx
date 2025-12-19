@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { DollarSign, TrendingUp, Users, Shield, Zap, Calculator, Download, Upload, Presentation, ArrowLeft, Settings, X, Search, Loader2, Building2, AlertTriangle, RotateCcw, Share2, Printer, FileText, BarChart3 } from 'lucide-react';
+import { DollarSign, TrendingUp, Users, Shield, Zap, Calculator, Download, Upload, Presentation, ArrowLeft, Settings, X, Search, Loader2, Building2, AlertTriangle, RotateCcw, Share2, Printer, FileText, BarChart3, HelpCircle } from 'lucide-react';
 
 export type ModelType = 'marketing' | 'ecommerce' | 'knowledge';
 
@@ -1960,7 +1960,33 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     document.body.removeChild(link);
   };
 
-  const SliderInput = ({ label, value, onChange, min, max, step, prefix = '', suffix = '', helper, decimals }: {
+  // Tooltip component
+  const Tooltip = ({ children, content }: { children: React.ReactNode; content: string }) => {
+    const [showTooltip, setShowTooltip] = useState(false);
+    
+    return (
+      <div className="relative inline-block">
+        <div
+          onMouseEnter={() => setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+          onFocus={() => setShowTooltip(true)}
+          onBlur={() => setShowTooltip(false)}
+          onClick={() => setShowTooltip(!showTooltip)}
+          className="cursor-help"
+        >
+          {children}
+        </div>
+        {showTooltip && (
+          <div className="absolute z-50 w-72 max-w-[calc(100vw-2rem)] p-3 text-xs text-gray-700 bg-white border border-gray-200 rounded-lg shadow-xl left-1/2 transform -translate-x-1/2 bottom-full mb-2 pointer-events-none">
+            <div className="whitespace-normal leading-relaxed">{content}</div>
+            <div className="absolute left-1/2 transform -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-200"></div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const SliderInput = ({ label, value, onChange, min, max, step, prefix = '', suffix = '', helper, decimals, tooltip }: {
     label: string;
     value: number;
     onChange: (val: number) => void;
@@ -1971,10 +1997,18 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     suffix?: string;
     helper?: string;
     decimals?: number;
+    tooltip?: string;
   }) => (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
-        <label className="text-sm font-medium text-gray-700">{label}</label>
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700">{label}</label>
+          {tooltip && (
+            <Tooltip content={tooltip}>
+              <HelpCircle className="w-4 h-4 text-gray-400 hover:text-blue-600 transition-colors" />
+            </Tooltip>
+          )}
+        </div>
         <span className="text-base font-bold text-blue-600">
           {prefix}{decimals !== undefined ? value.toFixed(decimals) : formatNumber(value)}{suffix}
         </span>
@@ -2053,14 +2087,81 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
                     <p className="text-sm text-blue-700 mb-3">Disconnected content systems and reliance on IT stall campaign launches and make personalization hard. Contentful brings all content into an API-first hub and gives marketers self-serve tools to build, test, and tailor experiences quickly.</p>
                     <div className="text-xs text-blue-600"><strong>Expected Outcomes:</strong> 25-78% conversion increase • 60-80% faster time-to-market • Higher marketing ROI</div>
                   </div>
-                  <SliderInput label="Monthly Website Visitors" value={inputs.monthlyVisitors} onChange={(val) => handleInputChange('monthlyVisitors', val)} min={10000} max={500000} step={10000} />
-                  <SliderInput label="Current Conversion Rate" value={inputs.currentConversionRate} onChange={(val) => handleInputChange('currentConversionRate', val)} min={0} max={5} step={0.1} suffix="%" decimals={1} />
-                  <SliderInput label="Avg Revenue per Conversion" value={inputs.avgRevenuePerConversion} onChange={(val) => handleInputChange('avgRevenuePerConversion', val)} min={500} max={20000} step={500} prefix="$" />
-                  <SliderInput label="Campaign Launch Time (Days)" value={inputs.campaignLaunchTime} onChange={(val) => handleInputChange('campaignLaunchTime', val)} min={7} max={90} step={1} helper="Current time to launch" />
-                  <SliderInput label="Major Campaigns per Year" value={inputs.campaignsPerYear} onChange={(val) => handleInputChange('campaignsPerYear', val)} min={1} max={24} step={1} helper="Number of significant launches annually" />
+                  <SliderInput 
+                    label="Monthly Website Visitors" 
+                    value={inputs.monthlyVisitors} 
+                    onChange={(val) => handleInputChange('monthlyVisitors', val)} 
+                    min={10000} 
+                    max={500000} 
+                    step={10000}
+                    tooltip="Multiplied by 12 to get annual visitors. Used to calculate current and new conversions: Annual Visitors × Conversion Rate = Conversions"
+                  />
+                  <SliderInput 
+                    label="Current Conversion Rate" 
+                    value={inputs.currentConversionRate} 
+                    onChange={(val) => handleInputChange('currentConversionRate', val)} 
+                    min={0} 
+                    max={5} 
+                    step={0.1} 
+                    suffix="%" 
+                    decimals={1}
+                    tooltip="Current conversion rate percentage. Used to calculate baseline revenue: Annual Visitors × (Current Rate ÷ 100) × Avg Revenue per Conversion = Current Annual Revenue"
+                  />
+                  <SliderInput 
+                    label="Avg Revenue per Conversion" 
+                    value={inputs.avgRevenuePerConversion} 
+                    onChange={(val) => handleInputChange('avgRevenuePerConversion', val)} 
+                    min={500} 
+                    max={20000} 
+                    step={500} 
+                    prefix="$"
+                    tooltip="Average revenue generated per conversion. Multiplied by conversion count to calculate total revenue: Conversions × Avg Revenue = Total Revenue"
+                  />
+                  <SliderInput 
+                    label="Campaign Launch Time (Days)" 
+                    value={inputs.campaignLaunchTime} 
+                    onChange={(val) => handleInputChange('campaignLaunchTime', val)} 
+                    min={7} 
+                    max={90} 
+                    step={1} 
+                    helper="Current time to launch"
+                    tooltip="Current days to launch a campaign. Used in time-to-market value calculation: (Current Revenue ÷ 365) × Launch Time × Reduction % × Campaigns per Year = Time-to-Market Value"
+                  />
+                  <SliderInput 
+                    label="Major Campaigns per Year" 
+                    value={inputs.campaignsPerYear} 
+                    onChange={(val) => handleInputChange('campaignsPerYear', val)} 
+                    min={1} 
+                    max={24} 
+                    step={1} 
+                    helper="Number of significant launches annually"
+                    tooltip="Number of major campaigns launched per year. Multiplied in time-to-market calculation to annualize the benefit: Time-to-Market Value per Campaign × Campaigns per Year"
+                  />
                   <div className="border-t pt-4">
-                    <SliderInput label="Expected Conversion Increase" value={inputs.conversionRateIncrease} onChange={(val) => handleInputChange('conversionRateIncrease', val)} min={0} max={100} step={5} suffix="%" helper="Conservative: 10%, Typical: 25-78%" />
-                    <div className="mt-4"><SliderInput label="Time-to-Market Reduction" value={inputs.timeToMarketReduction} onChange={(val) => handleInputChange('timeToMarketReduction', val)} min={30} max={90} step={5} suffix="%" helper="Launch in days vs weeks" /></div>
+                    <SliderInput 
+                      label="Expected Conversion Increase" 
+                      value={inputs.conversionRateIncrease} 
+                      onChange={(val) => handleInputChange('conversionRateIncrease', val)} 
+                      min={0} 
+                      max={100} 
+                      step={5} 
+                      suffix="%" 
+                      helper="Conservative: 10%, Typical: 25-78%"
+                      tooltip="Expected percentage increase in conversion rate. New rate = Current Rate × (1 + Increase % ÷ 100). Used to calculate conversion lift: (New Revenue - Current Revenue)"
+                    />
+                    <div className="mt-4">
+                      <SliderInput 
+                        label="Time-to-Market Reduction" 
+                        value={inputs.timeToMarketReduction} 
+                        onChange={(val) => handleInputChange('timeToMarketReduction', val)} 
+                        min={30} 
+                        max={90} 
+                        step={5} 
+                        suffix="%" 
+                        helper="Launch in days vs weeks"
+                        tooltip="Percentage reduction in campaign launch time. Applied to calculate time-to-market value: (Current Revenue ÷ 365) × Campaign Launch Time × Reduction % × Campaigns per Year"
+                      />
+                    </div>
                   </div>
                 </>
               )}
@@ -2072,12 +2173,67 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
                     <p className="text-sm text-blue-700 mb-3">Manual workflows, multiple CMSs, and developer ticket backlogs slow releases and inflate content costs. A single structured platform with a visual editor lets marketers publish independently while developers focus on higher-value work.</p>
                     <div className="text-xs text-blue-600"><strong>Expected Outcomes:</strong> 50-80% dev time reduction • CMS consolidation savings • Faster content cycles</div>
                   </div>
-                  <SliderInput label="Developer Hourly Rate" value={inputs.developerHourlyRate} onChange={(val) => handleInputChange('developerHourlyRate', val)} min={75} max={250} step={5} prefix="$" />
-                  <SliderInput label="Monthly Dev Hours on Content" value={inputs.monthlyDevHoursOnContent} onChange={(val) => handleInputChange('monthlyDevHoursOnContent', val)} min={40} max={400} step={10} helper="Hours on routine updates" />
-                  <SliderInput label="Number of CMS Systems" value={inputs.numberOfCMS} onChange={(val) => handleInputChange('numberOfCMS', val)} min={1} max={10} step={1} />
-                  <SliderInput label="Annual CMS Maintenance Cost" value={inputs.cmsMaintenanceCostPerYear} onChange={(val) => handleInputChange('cmsMaintenanceCostPerYear', val)} min={50000} max={500000} step={10000} prefix="$" />
-                  <SliderInput label="Marketing Team Size" value={inputs.marketingTeamSize} onChange={(val) => handleInputChange('marketingTeamSize', val)} min={3} max={50} step={1} />
-                  <div className="border-t pt-4"><SliderInput label="Developer Efficiency Gain" value={inputs.devEfficiencyGain} onChange={(val) => handleInputChange('devEfficiencyGain', val)} min={30} max={80} step={5} suffix="%" helper="Typical: 50-80%" /></div>
+                  <SliderInput 
+                    label="Developer Hourly Rate" 
+                    value={inputs.developerHourlyRate} 
+                    onChange={(val) => handleInputChange('developerHourlyRate', val)} 
+                    min={75} 
+                    max={250} 
+                    step={5} 
+                    prefix="$"
+                    tooltip="Hourly cost of developer time. Used to calculate dev cost savings: Saved Hours × Hourly Rate × 12 = Annual Dev Cost Savings"
+                  />
+                  <SliderInput 
+                    label="Monthly Dev Hours on Content" 
+                    value={inputs.monthlyDevHoursOnContent} 
+                    onChange={(val) => handleInputChange('monthlyDevHoursOnContent', val)} 
+                    min={40} 
+                    max={400} 
+                    step={10} 
+                    helper="Hours on routine updates"
+                    tooltip="Monthly hours developers spend on content tasks. Saved hours = Monthly Hours × (Efficiency Gain % ÷ 100). Annual savings = Saved Hours × Hourly Rate × 12"
+                  />
+                  <SliderInput 
+                    label="Number of CMS Systems" 
+                    value={inputs.numberOfCMS} 
+                    onChange={(val) => handleInputChange('numberOfCMS', val)} 
+                    min={1} 
+                    max={10} 
+                    step={1}
+                    tooltip="Current number of CMS platforms. Consolidation savings = Annual CMS Cost × ((Number of CMS - 1) ÷ Number of CMS). Assumes consolidating to one platform."
+                  />
+                  <SliderInput 
+                    label="Annual CMS Maintenance Cost" 
+                    value={inputs.cmsMaintenanceCostPerYear} 
+                    onChange={(val) => handleInputChange('cmsMaintenanceCostPerYear', val)} 
+                    min={50000} 
+                    max={500000} 
+                    step={10000} 
+                    prefix="$"
+                    tooltip="Total annual cost to maintain all CMS systems. Used in consolidation calculation: CMS Cost × ((Number of CMS - 1) ÷ Number of CMS) = Consolidation Savings"
+                  />
+                  <SliderInput 
+                    label="Marketing Team Size" 
+                    value={inputs.marketingTeamSize} 
+                    onChange={(val) => handleInputChange('marketingTeamSize', val)} 
+                    min={3} 
+                    max={50} 
+                    step={1}
+                    tooltip="Number of marketing team members. Productivity gain = Team Size × $80,000 × 0.3. Assumes 30% productivity improvement per team member."
+                  />
+                  <div className="border-t pt-4">
+                    <SliderInput 
+                      label="Developer Efficiency Gain" 
+                      value={inputs.devEfficiencyGain} 
+                      onChange={(val) => handleInputChange('devEfficiencyGain', val)} 
+                      min={30} 
+                      max={80} 
+                      step={5} 
+                      suffix="%" 
+                      helper="Typical: 50-80%"
+                      tooltip="Percentage reduction in developer time spent on content tasks. Saved hours = Monthly Hours × (Efficiency Gain % ÷ 100). Annual savings = Saved Hours × Hourly Rate × 12"
+                    />
+                  </div>
                 </>
               )}
 
@@ -2088,12 +2244,67 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
                     <p className="text-sm text-blue-700 mb-3">Legacy stacks expose businesses to outages, traffic-spike failures, and security or compliance gaps. Contentful's cloud-native architecture delivers high availability, rapid rollback, and strong governance controls.</p>
                     <div className="text-xs text-blue-600"><strong>Expected Outcomes:</strong> 99.99% uptime SLA • ISO 27001 & SOC 2 certified • Zero-downtime deployments</div>
                   </div>
-                  <SliderInput label="Downtime Hours per Year" value={inputs.downtimeHoursPerYear} onChange={(val) => handleInputChange('downtimeHoursPerYear', val)} min={1} max={100} step={1} />
-                  <SliderInput label="Hourly Revenue Loss" value={inputs.hourlyRevenueLoss} onChange={(val) => handleInputChange('hourlyRevenueLoss', val)} min={10000} max={200000} step={5000} prefix="$" />
-                  <SliderInput label="Annual Compliance Audit Cost" value={inputs.complianceAuditCost} onChange={(val) => handleInputChange('complianceAuditCost', val)} min={25000} max={200000} step={5000} prefix="$" />
-                  <SliderInput label="Security Incidents per Year" value={inputs.securityIncidentsPerYear} onChange={(val) => handleInputChange('securityIncidentsPerYear', val)} min={0} max={10} step={1} />
-                  <SliderInput label="Cost per Security Incident" value={inputs.incidentCost} onChange={(val) => handleInputChange('incidentCost', val)} min={25000} max={500000} step={25000} prefix="$" />
-                  <div className="border-t pt-4"><SliderInput label="Downtime Reduction" value={inputs.downtimeReduction} onChange={(val) => handleInputChange('downtimeReduction', val)} min={50} max={99} step={5} suffix="%" helper="99.99% uptime SLA" /></div>
+                  <SliderInput 
+                    label="Downtime Hours per Year" 
+                    value={inputs.downtimeHoursPerYear} 
+                    onChange={(val) => handleInputChange('downtimeHoursPerYear', val)} 
+                    min={1} 
+                    max={100} 
+                    step={1}
+                    tooltip="Current annual hours of system downtime. Current downtime cost = Downtime Hours × Hourly Revenue Loss. Savings = Current Cost × (Downtime Reduction % ÷ 100)"
+                  />
+                  <SliderInput 
+                    label="Hourly Revenue Loss" 
+                    value={inputs.hourlyRevenueLoss} 
+                    onChange={(val) => handleInputChange('hourlyRevenueLoss', val)} 
+                    min={10000} 
+                    max={200000} 
+                    step={5000} 
+                    prefix="$"
+                    tooltip="Revenue lost per hour during downtime. Used to calculate downtime cost: Downtime Hours × Hourly Revenue Loss = Current Downtime Cost"
+                  />
+                  <SliderInput 
+                    label="Annual Compliance Audit Cost" 
+                    value={inputs.complianceAuditCost} 
+                    onChange={(val) => handleInputChange('complianceAuditCost', val)} 
+                    min={25000} 
+                    max={200000} 
+                    step={5000} 
+                    prefix="$"
+                    tooltip="Annual cost of compliance audits. Compliance efficiency = Audit Cost × 0.4. Assumes 40% reduction in audit costs with enterprise certifications."
+                  />
+                  <SliderInput 
+                    label="Security Incidents per Year" 
+                    value={inputs.securityIncidentsPerYear} 
+                    onChange={(val) => handleInputChange('securityIncidentsPerYear', val)} 
+                    min={0} 
+                    max={10} 
+                    step={1}
+                    tooltip="Number of security incidents experienced annually. Security savings = Incidents × Cost per Incident × 0.75. Assumes 75% reduction in incidents."
+                  />
+                  <SliderInput 
+                    label="Cost per Security Incident" 
+                    value={inputs.incidentCost} 
+                    onChange={(val) => handleInputChange('incidentCost', val)} 
+                    min={25000} 
+                    max={500000} 
+                    step={25000} 
+                    prefix="$"
+                    tooltip="Average cost per security incident. Security savings = Incidents per Year × Cost per Incident × 0.75"
+                  />
+                  <div className="border-t pt-4">
+                    <SliderInput 
+                      label="Downtime Reduction" 
+                      value={inputs.downtimeReduction} 
+                      onChange={(val) => handleInputChange('downtimeReduction', val)} 
+                      min={50} 
+                      max={99} 
+                      step={5} 
+                      suffix="%" 
+                      helper="99.99% uptime SLA"
+                      tooltip="Percentage reduction in downtime hours. Downtime savings = (Downtime Hours × Hourly Revenue Loss) × (Reduction % ÷ 100)"
+                    />
+                  </div>
                 </>
               )}
 
@@ -2104,20 +2315,97 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
                     <p className="text-sm text-blue-700 mb-3">Siloed channels, limited personalization, and sluggish pages erode engagement and push visitors away. Composable delivery, reusable components, and native personalization create fast, consistent, and relevant journeys across every touchpoint.</p>
                     <div className="text-xs text-blue-600"><strong>Expected Outcomes:</strong> Reduced bounce rates • Higher NPS/CSAT • Increased repeat customers</div>
                   </div>
-                  <SliderInput label="Monthly Visitors" value={inputs.monthlyVisitors} onChange={(val) => handleInputChange('monthlyVisitors', val)} min={10000} max={500000} step={10000} />
-                  <SliderInput label="Current Bounce Rate" value={inputs.currentBounceRate} onChange={(val) => handleInputChange('currentBounceRate', val)} min={20} max={80} step={1} suffix="%" />
-                  <SliderInput label="Expected Bounce Rate Reduction" value={inputs.bounceRateReduction} onChange={(val) => handleInputChange('bounceRateReduction', val)} min={10} max={50} step={5} suffix="%" helper="Percentage reduction in bounce rate" />
-                  <SliderInput label="Repeat Customer Rate Increase" value={inputs.repeatCustomerRateIncrease} onChange={(val) => handleInputChange('repeatCustomerRateIncrease', val)} min={0} max={20} step={1} suffix="%" helper="Expected increase in repeat customers" />
-                  <div className="border-t pt-4"><SliderInput label="Expected CX Improvement" value={inputs.cxImprovement} onChange={(val) => handleInputChange('cxImprovement', val)} min={5} max={50} step={5} suffix="%" helper="Engagement lift (dampened by 0.5x)" /></div>
+                  <SliderInput 
+                    label="Monthly Visitors" 
+                    value={inputs.monthlyVisitors} 
+                    onChange={(val) => handleInputChange('monthlyVisitors', val)} 
+                    min={10000} 
+                    max={500000} 
+                    step={10000}
+                    tooltip="Monthly website visitors. Used to calculate base revenue: Monthly Visitors × 12 × (Conversion Rate ÷ 100) × Avg Revenue per Conversion = Base Annual Revenue"
+                  />
+                  <SliderInput 
+                    label="Current Bounce Rate" 
+                    value={inputs.currentBounceRate} 
+                    onChange={(val) => handleInputChange('currentBounceRate', val)} 
+                    min={20} 
+                    max={80} 
+                    step={1} 
+                    suffix="%"
+                    tooltip="Current percentage of visitors who bounce. Used with bounce rate reduction to calculate bounce impact: Base Revenue × ((Bounce Rate × Reduction %) ÷ 100)"
+                  />
+                  <SliderInput 
+                    label="Expected Bounce Rate Reduction" 
+                    value={inputs.bounceRateReduction} 
+                    onChange={(val) => handleInputChange('bounceRateReduction', val)} 
+                    min={10} 
+                    max={50} 
+                    step={5} 
+                    suffix="%" 
+                    helper="Percentage reduction in bounce rate"
+                    tooltip="Expected percentage reduction in bounce rate. Bounce impact = Base Revenue × ((Current Bounce Rate × Reduction %) ÷ 100)"
+                  />
+                  <SliderInput 
+                    label="Repeat Customer Rate Increase" 
+                    value={inputs.repeatCustomerRateIncrease} 
+                    onChange={(val) => handleInputChange('repeatCustomerRateIncrease', val)} 
+                    min={0} 
+                    max={20} 
+                    step={1} 
+                    suffix="%" 
+                    helper="Expected increase in repeat customers"
+                    tooltip="Expected percentage increase in repeat customer rate. Repeat customer lift = Base Revenue × (Increase % ÷ 100) × 0.5. The 0.5x multiplier accounts for gradual adoption."
+                  />
+                  <div className="border-t pt-4">
+                    <SliderInput 
+                      label="Expected CX Improvement" 
+                      value={inputs.cxImprovement} 
+                      onChange={(val) => handleInputChange('cxImprovement', val)} 
+                      min={5} 
+                      max={50} 
+                      step={5} 
+                      suffix="%" 
+                      helper="Engagement lift (dampened by 0.5x)"
+                      tooltip="Expected percentage improvement in customer experience metrics. Engagement lift = Base Revenue × (Improvement % ÷ 100) × 0.5. The 0.5x multiplier accounts for gradual impact."
+                    />
+                  </div>
                 </>
               )}
 
               <div className="border-t pt-6 mt-6">
                 <h3 className="font-semibold text-gray-900 mb-4">Investment</h3>
                 <div className="space-y-4">
-                  <SliderInput label="Implementation Cost" value={inputs.implementationCost} onChange={(val) => handleInputChange('implementationCost', val)} min={50000} max={500000} step={10000} prefix="$" />
-                  <SliderInput label="Implementation Time" value={inputs.implementationTime} onChange={(val) => handleInputChange('implementationTime', val)} min={1} max={18} step={1} suffix=" months" helper="Time before benefits begin" />
-                  <SliderInput label="Annual License Cost" value={inputs.annualLicenseCost} onChange={(val) => handleInputChange('annualLicenseCost', val)} min={25000} max={200000} step={5000} prefix="$" />
+                  <SliderInput 
+                    label="Implementation Cost" 
+                    value={inputs.implementationCost} 
+                    onChange={(val) => handleInputChange('implementationCost', val)} 
+                    min={50000} 
+                    max={500000} 
+                    step={10000} 
+                    prefix="$"
+                    tooltip="One-time cost to implement Contentful. Added to total investment cost: Total Cost = Implementation Cost + (Annual License Cost × ROI Years). Also used in payback calculation."
+                  />
+                  <SliderInput 
+                    label="Implementation Time" 
+                    value={inputs.implementationTime} 
+                    onChange={(val) => handleInputChange('implementationTime', val)} 
+                    min={1} 
+                    max={18} 
+                    step={1} 
+                    suffix=" months" 
+                    helper="Time before benefits begin"
+                    tooltip="Months required to implement Contentful before benefits begin. Added to payback period: Payback = Implementation Time + (Implementation Cost ÷ (Annual Benefit ÷ 12))"
+                  />
+                  <SliderInput 
+                    label="Annual License Cost" 
+                    value={inputs.annualLicenseCost} 
+                    onChange={(val) => handleInputChange('annualLicenseCost', val)} 
+                    min={25000} 
+                    max={200000} 
+                    step={5000} 
+                    prefix="$"
+                    tooltip="Annual Contentful license cost. Multiplied by ROI years and added to implementation cost: Total Cost = Implementation Cost + (Annual License × ROI Years)"
+                  />
                 </div>
               </div>
 
@@ -2133,7 +2421,8 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
                     max={100} 
                     step={5} 
                     suffix="%" 
-                    helper="Percentage of benefits attributable to Contentful" 
+                    helper="Percentage of benefits attributable to Contentful"
+                    tooltip="Percentage of revenue and CX benefits attributed to Contentful (vs other factors). Applied as multiplier: Revenue Benefit × (Attribution % ÷ 100) and CX Benefit × (Attribution % ÷ 100)"
                   />
                 </div>
               )}
