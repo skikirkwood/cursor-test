@@ -1,108 +1,69 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { DollarSign, TrendingUp, Users, Shield, Zap, Calculator, Download, Upload, Presentation, ArrowLeft, Settings, X, Search, Loader2, Building2, AlertTriangle, RotateCcw, Share2, Printer, FileText, BarChart3, HelpCircle } from 'lucide-react';
 
-export type ModelType = 'marketing' | 'ecommerce' | 'knowledge';
+export type ModelType = 'lifeblood';
 
 interface TCOCalculatorProps {
   model: ModelType;
   onBack: () => void;
 }
 
+// Fixed constant: average donation volume in litres
+const AVERAGE_DONATION_VOLUME_LITRES = 0.5;
+
 const modelConfigs = {
-  marketing: {
-    name: 'Marketing Sites',
-    enabledDrivers: ['revenue', 'cx'],
+  lifeblood: {
+    name: 'Lifeblood Digital Transformation',
+    enabledDrivers: ['donations', 'tco'],
     defaults: {
-      monthlyVisitors: 100000,
-      currentConversionRate: 2.5,
-      avgRevenuePerConversion: 2000,
-      campaignLaunchTime: 21,
-      campaignsPerYear: 6,
-      developerHourlyRate: 150,
-      monthlyDevHoursOnContent: 80,
-      numberOfCMS: 2,
-      cmsMaintenanceCostPerYear: 75000,
-      marketingTeamSize: 8,
-      downtimeHoursPerYear: 12,
-      hourlyRevenueLoss: 25000,
-      complianceAuditCost: 50000,
-      securityIncidentsPerYear: 1,
-      incidentCost: 75000,
-      currentBounceRate: 55,
-      bounceRateReduction: 30,
-      repeatCustomerRateIncrease: 10,
-      implementationCost: 125000,
+      // Blood Donation Volume
+      currentAnnualAppointments: 3000000,
+      percentCompletedAppointments: 50,
+      donorRetentionImprovement: 12,
+      newDonorAcquisitionIncrease: 15,
+      
+      // Current Platform Costs (Drupal + Oracle)
+      drupalLicenseCostPerYear: 0,
+      drupalHostingCostPerYear: 180000,
+      drupalMaintenanceCostPerYear: 345600, // 24 weeks × 4 devs × $7,200/week ÷ 2 years
+      drupalDevCostPerYear: 400000,
+      oracleLicenseCostPerYear: 500000,
+      oracleHostingCostPerYear: 200000,
+      oracleMaintenanceCostPerYear: 150000,
+      oracleDevCostPerYear: 300000,
+      
+      // Contentful Investment
+      contentfulLicenseCostPerYear: 150000,
+      contentfulImplementationCost: 150000,
+      contentfulMaintenanceCostPerYear: 50000,
       implementationTime: 6,
-      annualLicenseCost: 60000,
-      conversionRateIncrease: 15,
-      timeToMarketReduction: 65,
-      devEfficiencyGain: 45,
-      downtimeReduction: 85,
-      cxImprovement: 10
-    }
-  },
-  ecommerce: {
-    name: 'Ecommerce Sites',
-    enabledDrivers: ['revenue', 'risk'],
-    defaults: {
-      monthlyVisitors: 250000,
-      currentConversionRate: 2.5,
-      avgRevenuePerConversion: 150,
-      campaignLaunchTime: 14,
+      
+      // Legacy fields for compatibility
+      monthlyVisitors: 500000,
+      currentConversionRate: 3.5,
+      avgRevenuePerConversion: 450,
+      campaignLaunchTime: 21,
       campaignsPerYear: 12,
-      developerHourlyRate: 175,
-      monthlyDevHoursOnContent: 120,
-      numberOfCMS: 3,
-      cmsMaintenanceCostPerYear: 150000,
-      marketingTeamSize: 12,
-      downtimeHoursPerYear: 8,
-      hourlyRevenueLoss: 100000,
+      developerHourlyRate: 180,
+      monthlyDevHoursOnContent: 100,
+      numberOfCMS: 2,
+      cmsMaintenanceCostPerYear: 1980000,
+      marketingTeamSize: 15,
+      downtimeHoursPerYear: 24,
+      hourlyRevenueLoss: 50000,
       complianceAuditCost: 100000,
-      securityIncidentsPerYear: 3,
+      securityIncidentsPerYear: 1,
       incidentCost: 150000,
       currentBounceRate: 40,
       bounceRateReduction: 25,
-      repeatCustomerRateIncrease: 10,
-      implementationCost: 200000,
-      implementationTime: 9,
-      annualLicenseCost: 100000,
-      conversionRateIncrease: 25,
-      timeToMarketReduction: 70,
-      devEfficiencyGain: 55,
-      downtimeReduction: 95,
-      cxImprovement: 10
-    }
-  },
-  knowledge: {
-    name: 'Knowledge Bases',
-    enabledDrivers: ['efficiency', 'cx'],
-    defaults: {
-      monthlyVisitors: 75000,
-      currentConversionRate: 2.5,
-      avgRevenuePerConversion: 500,
-      campaignLaunchTime: 30,
-      campaignsPerYear: 4,
-      developerHourlyRate: 140,
-      monthlyDevHoursOnContent: 200,
-      numberOfCMS: 4,
-      cmsMaintenanceCostPerYear: 120000,
-      marketingTeamSize: 6,
-      downtimeHoursPerYear: 16,
-      hourlyRevenueLoss: 15000,
-      complianceAuditCost: 60000,
-      securityIncidentsPerYear: 1,
-      incidentCost: 50000,
-      currentBounceRate: 35,
-      bounceRateReduction: 35,
-      repeatCustomerRateIncrease: 10,
-      implementationCost: 100000,
-      implementationTime: 4,
-      annualLicenseCost: 50000,
-      conversionRateIncrease: 5,
-      timeToMarketReduction: 50,
-      devEfficiencyGain: 60,
-      downtimeReduction: 80,
-      cxImprovement: 10
+      repeatCustomerRateIncrease: 12,
+      implementationCost: 150000,
+      annualLicenseCost: 150000,
+      conversionRateIncrease: 15,
+      timeToMarketReduction: 60,
+      devEfficiencyGain: 70,
+      downtimeReduction: 90,
+      cxImprovement: 15
     }
   }
 };
@@ -415,20 +376,70 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
     };
   };
 
+  // Calculate Blood Donation Volume Impact (in litres)
+  const calculateDonationsImpact = () => {
+    // Compute current annual donations from appointments and completion rate
+    const currentAnnualDonations = inputs.currentAnnualAppointments * (inputs.percentCompletedAppointments / 100);
+    const currentAnnualVolumeLitres = currentAnnualDonations * AVERAGE_DONATION_VOLUME_LITRES;
+    const additionalDonationsFromRetention = currentAnnualDonations * (inputs.donorRetentionImprovement / 100);
+    const additionalDonationsFromAcquisition = currentAnnualDonations * (inputs.newDonorAcquisitionIncrease / 100);
+    const totalAdditionalDonations = additionalDonationsFromRetention + additionalDonationsFromAcquisition;
+    
+    // Convert to volume in litres
+    const volumeFromRetention = additionalDonationsFromRetention * AVERAGE_DONATION_VOLUME_LITRES;
+    const volumeFromAcquisition = additionalDonationsFromAcquisition * AVERAGE_DONATION_VOLUME_LITRES;
+    const totalAdditionalVolumeLitres = totalAdditionalDonations * AVERAGE_DONATION_VOLUME_LITRES;
+    
+    return {
+      currentAnnualDonations,
+      currentAnnualVolumeLitres,
+      additionalDonationsFromRetention,
+      additionalDonationsFromAcquisition,
+      totalAdditionalDonations,
+      volumeFromRetention,
+      volumeFromAcquisition,
+      totalAdditionalVolumeLitres,
+      // Keep for compatibility with total benefit calculation (using a placeholder value per litre for ROI calc)
+      totalDonationsValue: 0 // Volume-based, not revenue-based
+    };
+  };
+
+  // Calculate TCO Savings (Drupal + Oracle elimination)
+  const calculateTCOImpact = () => {
+    const currentDrupalCost = inputs.drupalLicenseCostPerYear + inputs.drupalHostingCostPerYear + inputs.drupalMaintenanceCostPerYear + inputs.drupalDevCostPerYear;
+    const currentOracleCost = inputs.oracleLicenseCostPerYear + inputs.oracleHostingCostPerYear + inputs.oracleMaintenanceCostPerYear + inputs.oracleDevCostPerYear;
+    const totalLegacyCost = currentDrupalCost + currentOracleCost;
+    const contentfulAnnualCost = inputs.contentfulLicenseCostPerYear + inputs.contentfulMaintenanceCostPerYear;
+    const annualSavings = totalLegacyCost - contentfulAnnualCost;
+    return {
+      currentDrupalCost,
+      currentOracleCost,
+      totalLegacyCost,
+      contentfulAnnualCost,
+      annualSavings,
+      totalTCOSavings: annualSavings
+    };
+  };
+
   const revenue = calculateRevenueImpact();
   const efficiency = calculateEfficiencyImpact();
   const risk = calculateRiskImpact();
   const cx = calculateCXImpact();
+  const donations = calculateDonationsImpact();
+  const tco = calculateTCOImpact();
 
-  // Apply attribution factor to revenue and CX benefits for marketing model
-  const attributionFactor = model === 'marketing' ? (attributionPercent / 100) : 1;
+  // Apply attribution factor
+  const attributionFactor = 1;
   
   const totalAnnualBenefit = 
+    (enabledDrivers.includes('donations') ? donations.totalDonationsValue : 0) +
+    (enabledDrivers.includes('tco') ? tco.totalTCOSavings : 0) +
     (enabledDrivers.includes('revenue') ? revenue.totalLift * attributionFactor : 0) + 
     (enabledDrivers.includes('efficiency') ? efficiency.totalSavings : 0) + 
     (enabledDrivers.includes('risk') ? risk.totalRiskReduction : 0) + 
     (enabledDrivers.includes('cx') ? cx.totalCXValue * attributionFactor : 0);
   const multiYearBenefit = totalAnnualBenefit * roiYears;
+  const contentfulTotalCost = inputs.contentfulImplementationCost + (inputs.contentfulLicenseCostPerYear * roiYears) + (inputs.contentfulMaintenanceCostPerYear * roiYears);
   const totalCost = inputs.implementationCost + (inputs.annualLicenseCost * roiYears);
   const netBenefit = multiYearBenefit - totalCost;
   const roi = ((netBenefit / totalCost) * 100);
@@ -436,7 +447,7 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
   const paybackMonths = inputs.implementationTime + (inputs.implementationCost / (totalAnnualBenefit / 12));
 
   const formatCurrency = (num) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(num);
+    return new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(num);
   };
 
   const formatNumber = (num) => {
@@ -2019,10 +2030,12 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
   );
 
   const allValueDrivers = [
+    { id: 'donations', name: 'Blood Donation Value', icon: TrendingUp, color: 'red' },
+    { id: 'tco', name: 'TCO Savings', icon: DollarSign, color: 'green' },
     { id: 'revenue', name: 'Revenue Growth', icon: TrendingUp, color: 'green' },
     { id: 'efficiency', name: 'Operational Efficiency', icon: Zap, color: 'blue' },
     { id: 'risk', name: 'Risk Mitigation', icon: Shield, color: 'purple' },
-    { id: 'cx', name: 'Customer Experience', icon: Users, color: 'orange' }
+    { id: 'cx', name: 'Donor Experience', icon: Users, color: 'orange' }
   ];
   
   const valueDrivers = allValueDrivers.filter(d => enabledDrivers.includes(d.id));
@@ -2051,8 +2064,8 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
           </div>
         </div>
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Contentful Value ROI Calculator</h1>
-          <p className="text-gray-600">{config.name} — Calculate business impact across key value drivers</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Lifeblood Digital Transformation ROI</h1>
+          <p className="text-gray-600">Calculate the value of increased blood donations and TCO savings from replacing Drupal & Oracle with Contentful</p>
           {companyData && (
             <p className="text-blue-600 text-sm mt-1">
               <Building2 className="w-4 h-4 inline mr-1" />
@@ -2409,96 +2422,48 @@ export default function TCOCalculator({ model, onBack }: TCOCalculatorProps) {
                 </div>
               </div>
 
-              {model === 'marketing' && (
-                <div className="border-t pt-6 mt-6">
-                  <h3 className="font-semibold text-gray-900 mb-2">Benefit Attribution</h3>
-                  <p className="text-xs text-gray-500 mb-4">Reduce the calculated revenue and CX benefits to account for partial attribution to Contentful</p>
-                  <SliderInput 
-                    label="Attribution Factor" 
-                    value={attributionPercent} 
-                    onChange={(val) => setAttributionPercent(val)} 
-                    min={0} 
-                    max={100} 
-                    step={5} 
-                    suffix="%" 
-                    helper="Percentage of benefits attributable to Contentful"
-                    tooltip="Percentage of revenue and CX benefits attributed to Contentful (vs other factors). Applied as multiplier: Revenue Benefit × (Attribution % ÷ 100) and CX Benefit × (Attribution % ÷ 100)"
-                  />
-                </div>
-              )}
             </div>
           </div>
 
           <div className="space-y-6">
-            <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg p-4 md:p-6 text-white">
+            <div className="bg-gradient-to-br from-red-500 to-rose-600 rounded-xl shadow-lg p-4 md:p-6 text-white">
               <h2 className="text-xl md:text-2xl font-bold mb-6">Total Business Impact</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">Annual Benefit</div><div className="text-xl md:text-2xl font-bold">{formatCurrency(totalAnnualBenefit)}</div></div>
-                <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">{roiYears}-Year Benefit</div><div className="text-xl md:text-2xl font-bold">{formatCurrency(multiYearBenefit)}</div></div>
-                <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">ROI ({roiYears} Years)</div><div className="text-xl md:text-2xl font-bold">{roi.toFixed(0)}%</div></div>
-                <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">Payback Period</div><div className="text-xl md:text-2xl font-bold">{paybackMonths.toFixed(1)} months</div></div>
+                <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">Additional Blood Volume (Annual)</div><div className="text-xl md:text-2xl font-bold">+{formatNumber(donations.totalAdditionalVolumeLitres)} L</div></div>
+                <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">Annual Volume Increase</div><div className="text-xl md:text-2xl font-bold">+{((donations.totalAdditionalVolumeLitres / donations.currentAnnualVolumeLitres) * 100).toFixed(1)}%</div></div>
+                <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">Annual TCO Savings</div><div className="text-xl md:text-2xl font-bold">{formatCurrency(tco.totalTCOSavings)}</div></div>
+                <div className="bg-white/10 backdrop-blur rounded-lg p-4"><div className="text-xs md:text-sm opacity-90 mb-1">{roiYears}-Year TCO Savings</div><div className="text-xl md:text-2xl font-bold">{formatCurrency(tco.totalTCOSavings * roiYears)}</div></div>
               </div>
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-blue-600" />
-                Value Driver Breakdown
-              </h3>
-              
-              {/* Visual Chart */}
-              <div className="mb-4 space-y-3">
-                {[
-                  { name: 'Revenue Growth', value: enabledDrivers.includes('revenue') ? revenue.totalLift : 0, color: 'bg-green-500', icon: TrendingUp, enabled: enabledDrivers.includes('revenue') },
-                  { name: 'Efficiency', value: enabledDrivers.includes('efficiency') ? efficiency.totalSavings : 0, color: 'bg-blue-500', icon: Zap, enabled: enabledDrivers.includes('efficiency') },
-                  { name: 'Risk Mitigation', value: enabledDrivers.includes('risk') ? risk.totalRiskReduction : 0, color: 'bg-purple-500', icon: Shield, enabled: enabledDrivers.includes('risk') },
-                  { name: 'Customer Experience', value: enabledDrivers.includes('cx') ? cx.totalCXValue : 0, color: 'bg-orange-500', icon: Users, enabled: enabledDrivers.includes('cx') }
-                ].filter(driver => driver.enabled).map((driver) => {
-                  const maxValue = Math.max(
-                    enabledDrivers.includes('revenue') ? revenue.totalLift : 0,
-                    enabledDrivers.includes('efficiency') ? efficiency.totalSavings : 0,
-                    enabledDrivers.includes('risk') ? risk.totalRiskReduction : 0,
-                    enabledDrivers.includes('cx') ? cx.totalCXValue : 0
-                  );
-                  const percentage = maxValue > 0 ? (driver.value / maxValue) * 100 : 0;
-                  const Icon = driver.icon;
-                  return (
-                    <div key={driver.name} className="space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <div className="flex items-center gap-2">
-                          <Icon className="w-4 h-4 text-gray-600" />
-                          <span className="font-medium text-gray-700">{driver.name}</span>
-                        </div>
-                        <span className="font-bold text-gray-900">{formatCurrency(driver.value)}</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
-                        <div className={`${driver.color} h-3 rounded-full transition-all duration-500`} style={{ width: `${percentage}%` }}></div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="space-y-3 border-t pt-4">
+              <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Value Driver Breakdown</h3>
+              <div className="space-y-3">
+                {enabledDrivers.includes('donations') && <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg"><div className="flex items-center gap-2"><TrendingUp className="w-5 h-5 text-red-600" /><span className="font-medium text-gray-900">Additional Blood Volume</span></div><span className="text-lg font-bold text-red-600">+{formatNumber(donations.totalAdditionalVolumeLitres)} L</span></div>}
+                {enabledDrivers.includes('tco') && <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg"><div className="flex items-center gap-2"><DollarSign className="w-5 h-5 text-green-600" /><span className="font-medium text-gray-900">TCO Savings</span></div><span className="text-lg font-bold text-green-600">{formatCurrency(tco.totalTCOSavings)}</span></div>}
                 {enabledDrivers.includes('revenue') && <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg"><div className="flex items-center gap-2"><TrendingUp className="w-5 h-5 text-green-600" /><span className="font-medium text-gray-900">Revenue Growth</span></div><span className="text-lg font-bold text-green-600">{formatCurrency(revenue.totalLift)}</span></div>}
                 {enabledDrivers.includes('efficiency') && <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg"><div className="flex items-center gap-2"><Zap className="w-5 h-5 text-blue-600" /><span className="font-medium text-gray-900">Efficiency</span></div><span className="text-lg font-bold text-blue-600">{formatCurrency(efficiency.totalSavings)}</span></div>}
                 {enabledDrivers.includes('risk') && <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg"><div className="flex items-center gap-2"><Shield className="w-5 h-5 text-purple-600" /><span className="font-medium text-gray-900">Risk Mitigation</span></div><span className="text-lg font-bold text-purple-600">{formatCurrency(risk.totalRiskReduction)}</span></div>}
-                {enabledDrivers.includes('cx') && <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg"><div className="flex items-center gap-2"><Users className="w-5 h-5 text-orange-600" /><span className="font-medium text-gray-900">Customer Experience</span></div><span className="text-lg font-bold text-orange-600">{formatCurrency(cx.totalCXValue)}</span></div>}
+                {enabledDrivers.includes('cx') && <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg"><div className="flex items-center gap-2"><Users className="w-5 h-5 text-orange-600" /><span className="font-medium text-gray-900">Donor Experience</span></div><span className="text-lg font-bold text-orange-600">{formatCurrency(cx.totalCXValue)}</span></div>}
               </div>
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
               <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">
+                {valueDriver === 'donations' && 'Blood Volume Increase Details'}
+                {valueDriver === 'tco' && 'TCO Savings Details'}
                 {valueDriver === 'revenue' && 'Revenue Growth Details'}
                 {valueDriver === 'efficiency' && 'Efficiency Savings'}
                 {valueDriver === 'risk' && 'Risk Reduction Details'}
-                {valueDriver === 'cx' && 'CX Impact Details'}
+                {valueDriver === 'cx' && 'Donor Experience Details'}
               </h3>
               <div className="space-y-3">
+                {valueDriver === 'donations' && (<><div className="flex justify-between text-sm"><span className="text-gray-600">From Donor Retention</span><span className="font-semibold">+{formatNumber(donations.volumeFromRetention)} L ({formatNumber(donations.additionalDonationsFromRetention)} donations)</span></div><div className="flex justify-between text-sm"><span className="text-gray-600">From New Donor Acquisition</span><span className="font-semibold">+{formatNumber(donations.volumeFromAcquisition)} L ({formatNumber(donations.additionalDonationsFromAcquisition)} donations)</span></div><div className="flex justify-between text-sm pt-3 border-t"><span className="font-medium">Total Additional Blood Volume</span><span className="font-bold text-red-600">+{formatNumber(donations.totalAdditionalVolumeLitres)} L ({formatNumber(donations.totalAdditionalDonations)} donations)</span></div></>)}
+                {valueDriver === 'tco' && (<><div className="flex justify-between text-sm"><span className="text-gray-600">Current Drupal Costs</span><span className="font-semibold text-red-500">-{formatCurrency(tco.currentDrupalCost)}</span></div><div className="flex justify-between text-sm"><span className="text-gray-600">Current Oracle Costs</span><span className="font-semibold text-red-500">-{formatCurrency(tco.currentOracleCost)}</span></div><div className="flex justify-between text-sm"><span className="text-gray-600">Contentful Annual Cost</span><span className="font-semibold">+{formatCurrency(tco.contentfulAnnualCost)}</span></div><div className="flex justify-between text-sm pt-3 border-t"><span className="font-medium">Net Annual TCO Savings</span><span className="font-bold text-green-600">{formatCurrency(tco.totalTCOSavings)}</span></div></>)}
                 {valueDriver === 'revenue' && (<><div className="flex justify-between text-sm"><span className="text-gray-600">Conversion Rate Lift</span><span className="font-semibold">{formatCurrency(revenue.conversionLift)}</span></div><div className="flex justify-between text-sm"><span className="text-gray-600">Time-to-Market Value</span><span className="font-semibold">{formatCurrency(revenue.timeToMarketValue)}</span></div><div className="flex justify-between text-sm pt-3 border-t"><span className="font-medium">Total Revenue Impact</span><span className="font-bold text-green-600">{formatCurrency(revenue.totalLift)}</span></div></>)}
                 {valueDriver === 'efficiency' && (<><div className="flex justify-between text-sm"><span className="text-gray-600">Dev Cost Savings</span><span className="font-semibold">{formatCurrency(efficiency.devCostSavings)}</span></div><div className="flex justify-between text-sm"><span className="text-gray-600">CMS Consolidation</span><span className="font-semibold">{formatCurrency(efficiency.cmsConsolidationSavings)}</span></div><div className="flex justify-between text-sm"><span className="text-gray-600">Marketing Productivity</span><span className="font-semibold">{formatCurrency(efficiency.marketingProductivityGain)}</span></div><div className="flex justify-between text-sm pt-3 border-t"><span className="font-medium">Total Savings</span><span className="font-bold text-blue-600">{formatCurrency(efficiency.totalSavings)}</span></div></>)}
                 {valueDriver === 'risk' && (<><div className="flex justify-between text-sm"><span className="text-gray-600">Downtime Reduction</span><span className="font-semibold">{formatCurrency(risk.downtimeSavings)}</span></div><div className="flex justify-between text-sm"><span className="text-gray-600">Security Savings</span><span className="font-semibold">{formatCurrency(risk.securitySavings)}</span></div><div className="flex justify-between text-sm"><span className="text-gray-600">Compliance Efficiency</span><span className="font-semibold">{formatCurrency(risk.complianceEfficiency)}</span></div><div className="flex justify-between text-sm pt-3 border-t"><span className="font-medium">Total Risk Reduction</span><span className="font-bold text-purple-600">{formatCurrency(risk.totalRiskReduction)}</span></div></>)}
-                {valueDriver === 'cx' && (<><div className="flex justify-between text-sm"><span className="text-gray-600">Bounce Reduction Impact</span><span className="font-semibold">{formatCurrency(cx.bounceImpact)}</span></div><div className="flex justify-between text-sm"><span className="text-gray-600">Engagement Lift</span><span className="font-semibold">{formatCurrency(cx.engagementLift)}</span></div><div className="flex justify-between text-sm"><span className="text-gray-600">Repeat Customer Value</span><span className="font-semibold">{formatCurrency(cx.repeatCustomerLift)}</span></div><div className="flex justify-between text-sm pt-3 border-t"><span className="font-medium">Total CX Value</span><span className="font-bold text-orange-600">{formatCurrency(cx.totalCXValue)}</span></div></>)}
+                {valueDriver === 'cx' && (<><div className="flex justify-between text-sm"><span className="text-gray-600">Bounce Reduction Impact</span><span className="font-semibold">{formatCurrency(cx.bounceImpact)}</span></div><div className="flex justify-between text-sm"><span className="text-gray-600">Engagement Lift</span><span className="font-semibold">{formatCurrency(cx.engagementLift)}</span></div><div className="flex justify-between text-sm"><span className="text-gray-600">Repeat Donor Value</span><span className="font-semibold">{formatCurrency(cx.repeatCustomerLift)}</span></div><div className="flex justify-between text-sm pt-3 border-t"><span className="font-medium">Total Donor Experience Value</span><span className="font-bold text-orange-600">{formatCurrency(cx.totalCXValue)}</span></div></>)}
               </div>
             </div>
 
